@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هکتوریا -مصنوعی</title>
+    <style>
+        :root {
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --neon-blue: #00f6ff;
+    --neon-purple: #9d00ff;
+    --font-family: 'Vazirmatn', sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.background-blurs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.blur-circle {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.3;
+    animation: move 20s infinite alternate;
+}
+
+.color-1 { background-color: #89f7fe; width: 300px; height: 300px; top: 10%; left: 5%; }
+.color-2 { background-color: #d299ff; width: 400px; height: 400px; top: 50%; right: 10%; }
+.color-3 { background-color: #ff8c8c; width: 250px; height: 250px; bottom: 15%; left: 20%; }
+.color-4 { background-color: #fff2a8; width: 350px; height: 350px; bottom: 5%; right: 25%; }
+
+@keyframes move {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(50px, -50px) scale(1.2); }
+}
+
+header {
+    padding: 20px 5%;
+}
+
+.navbar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    transition: background 0.3s;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.glass-card {
+    width: 100%;
+    max-width: 800px;
+    padding: 40px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+/* Chatbot Styles */
+#chat-container {
+    margin-top: 30px;
+    text-align: right;
+}
+
+#chat-box {
+    height: 300px;
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 15px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    max-width: 80%;
+}
+
+.user-message {
+    background-color: var(--neon-blue);
+    color: #000;
+    align-self: flex-end;
+}
+
+.bot-message {
+    background-color: #3a3a3a;
+    align-self: flex-start;
+}
+
+#input-container {
+    display: flex;
+}
+
+#user-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--glass-border);
+    border-radius: 10px 0 0 10px;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-color);
+    font-family: var(--font-family);
+}
+
+#send-btn {
+    padding: 10px 20px;
+    border: none;
+    background-color: var(--neon-blue);
+    color: #000;
+    cursor: pointer;
+    border-radius: 0 10px 10px 0;
+    font-family: var(--font-family);
+    transition: background-color 0.3s;
+}
+
+#send-btn:hover {
+    background-color: var(--neon-purple);
+    color: #fff;
+}
+
+footer {
+    padding: 20px 5%;
+    text-align: center;
+}
+
+.footer-line {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), transparent);
+    animation: animate-line 4s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes animate-line {
+    0% { background-position: -200%; }
+    100% { background-position: 200%; }
+}
+
+.footer-links a {
+    color: #aaa;
+    text-decoration: none;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--text-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .glass-card { padding: 30px; }
+    h1 { font-size: 2rem; }
+}
+
+@media (max-width: 375px) {
+    .glass-card { padding: 20px; }
+    h1 { font-size: 1.8rem; }
+    .nav-link { padding: 8px 15px; font-size: 1rem; }
+    #chat-box { height: 250px; }
+}
+    </style>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <div class="background-blurs">
+        <div class="blur-circle color-1"></div>
+        <div class="blur-circle color-2"></div>
+        <div class="blur-circle color-3"></div>
+        <div class="blur-circle color-4"></div>
+    </div>
+
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="nav-link">خانه</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="glass-card">
+            <h1>هکتوریا - هوش مصنوعی آزمایشی</h1>
+
+            <div id="chat-container">
+                <div id="chat-box"></div>
+                <div id="input-container">
+                    <input type="text" id="user-input" placeholder="سوال خود را بپرسید...">
+                    <button id="send-btn">ارسال</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-line"></div>
+        <div class="footer-content">
+            <p>© هکتوریا | تمامی حقوق محفوظ است.</p>
+
+        </div>
+    </footer>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    // --- پایگاه داده ابزارهای سایت شما ---
+    const allTools = [
+        { name: 'مورفولوژی باکتری‌ها', category: 'dev', tag: 'رایگان', img: 'https://uploadkon.ir/uploads/30f316_25Screenshot-from-2025-10-16-22-12-49.png', featured: true, desc: 'باکتری های مورد نظر خود را بشناسید و نحوه رنگ آمیزی آن را مشاهده نمایید.', url: 'bacterial.html', keywords: ['باکتری', 'مورفولوژی', 'زیست شناسی', 'میکروب', 'آزمایشگاه', 'رنگ آمیزی'] },
+        { name: 'فلش کارت حرفه ای', category: 'design', tag: 'رایگان', img: 'https://uploadkon.ir/uploads/520316_25Screenshot-from-2025-10-16-22-26-32.png', featured: true, desc: 'ابزاری برای ساخت، مطالعه و به اشتراک‌گذاری فلش‌کارت‌های آموزشی جهت یادگیری آسان و موثر دروس.', url: 'flashcard.html', keywords: ['فلش کارت', 'یادگیری', 'حفظ کردن', 'درس', 'مطالعه', 'مرور', 'امتحان'] },
+        { name: 'انتخاب‌ واحد هوشمند رشته کامپیوتر', category: 'data', tag: 'رایگان', img: 'https://uploadkon.ir/uploads/fe9516_25Screenshot-from-2025-10-16-22-13-00.png', url: 'entekhab.html', keywords: ['انتخاب واحد', 'چارت درسی', 'هم نیاز', 'پیش نیاز', 'واحد', 'دروس', 'انتخاب درس'] },
+        { name: 'اطلاعات سیستم شما', category: 'security', tag: 'رایگان', img: 'https://uploadkon.ir/uploads/9afa16_25Screenshot-from-2025-10-16-22-27-06.png', featured: true, desc: 'مشخصات کامل سخت‌افزاری و نرم‌افزاری سیستم خود را مشاهده کنید.', url: 'systeminfo.html', keywords: ['سیستم', 'مشخصات', 'کامپیوتر من', 'اطلاعات سیستم', 'سخت افزار', 'نرم افزار'] },
+        { name: 'رسم توابع ریاضی', category: 'dev', tag: 'رایگان', img: 'https://uploadkon.ir/uploads/2b0816_25Screenshot-from-2025-10-16-22-12-44.png', url: 'geomath.html', keywords: ['ریاضی', 'تابع', 'نمودار', 'رسم', 'معادله', 'هندسه'] },
+        { name: 'دعوتنامه', category: 'dev', tag: 'رایگان', img: 'https://uploadkon.ir/uploads/cbe716_25Screenshot-from-2025-10-16-22-12-57.png', url: 'invite.html', keywords: ['دعوت', 'مهمانی', 'کارت دعوت', 'دعوتنامه'] },
+        { name: 'مقایسه هوشمند متن', category: 'design', tag: 'رایگان', img: 'https://uploadkon.ir/uploads/d9bf16_25Screenshot-from-2025-10-16-22-39-42.png', url: 'compair.html', keywords: ['مقایسه متن', 'تفاوت متن', 'سرقت ادبی', 'plagiarism', 'مقایسه'] },
+        { name: 'هوش مصنوعی', category: 'data', tag: 'رایگان', img: 'https://uploadkon.ir/uploads/4f5516_25Screenshot-from-2025-10-16-22-39-39.png', url: 'arti.html', keywords: ['هوش مصنوعی', 'چت بات', 'ai', 'ربات'] },
+    ];
+
+    // --- پایگاه دانش گسترده ---
+    const knowledgeBase = {
+        // --- دسته: احوال‌پرسی و شروع مکالمه ---
+            "سلام": "سلام! خوش آمدید. من هکتوریا - رستمی هستم. چطور می‌توانم کمکتان کنم؟",
+            "درود": "درود بر شما! آماده پاسخگویی به سوالاتتان هستم.",
+            "وقت بخیر": "وقت شما هم بخیر. چه کمکی از دست من ساخته است؟",
+            "صبح بخیر": "صبح زیبای شما بخیر! روز خوبی داشته باشید.",
+            "عصر بخیر": "عصر شما بخیر. امیدوارم روز خوبی را سپری کرده باشید.",
+            "خوبی": "ممنون، من یک هوش مصنوعی هستم و همیشه در بهترین حالت خودم هستم! شما چطورید؟",
+            "چطوری": "ممنون از احوال‌پرسی شما. من یک برنامه کامپیوتری هستم و آماده کمک کردنم.",
+
+            // --- دسته: معرفی و شناخت هوش مصنوعی ---
+            "اسم": "نام من هکتوریا - رستمی است.",
+            "نام تو": "نام من هکتوریا - رستمی است.",
+            "کی هستی": "من هکتوریا - رستمی هستم، یک دستیار هوش مصنوعی.",
+            "خودتو معرفی کن": "حتما. من هکتوریا - رستمی هستم. یک هوش مصنوعی که برای پاسخ به سوالات عمومی و آزمون‌های ترکیبی طراحی شده.",
+            "سازنده": "من توسط یک برنامه‌نویس خلاق با استفاده از دانش هوش مصنوعی ساخته شده‌ام.",
+            "چه کار": "من می‌توانم به سوالات عمومی شما پاسخ دهم و اطلاعاتی در زمینه‌های مختلف در اختیار شما قرار دهم.",
+            "چیکار میکنی": "من می‌توانم به سوالات عمومی شما پاسخ دهم و اطلاعاتی در زمینه‌های مختلف در اختیار شما قرار دهم.",
+            "هدف تو چیه": "هدف من ارائه پاسخ‌های سریع و دقیق به سوالات شما و کمک به یادگیری شماست.",
+
+            // --- دسته: دانش عمومی ---
+            "آسمان": "آسمان در طول روز به دلیل پراکندگی نور خورشید توسط جو زمین، آبی به نظر می‌رسد.",
+            "آسمون": "آسمان در طول روز به دلیل پراکندگی نور خورشید توسط جو زمین، آبی به نظر می‌رسد.",
+            "پایتخت ایران": "پایتخت ایران، شهر تهران است.",
+            "تهران": "تهران پایتخت ایران و یکی از بزرگترین شهرهای خاورمیانه است.",
+            "بزرگترین سیاره": "بزرگترین سیاره در منظومه شمسی، سیاره مشتری (Jupiter) است.",
+            "خورشید": "خورشید یک ستاره است که در مرکز منظومه شمسی قرار دارد و منبع اصلی نور و گرما برای زمین است.",
+            "آب": "فرمول شیمیایی آب H2O است که از دو اتم هیدروژن و یک اتم اکسیژن تشکیل شده.",
+            "رنگین کمان": "رنگین کمان پدیده‌ای نوری است که وقتی نور خورشید از قطرات باران عبور می‌کند، به وجود می‌آید.",
+            "اینترنت": "اینترنت یک شبکه جهانی از کامپیوترهاست که امکان تبادل اطلاعات و ارتباطات را فراهم می‌کند.",
+            "گیت هاب": "گیت‌هاب یک سرویس میزبانی وب برای پروژه‌های نرم‌افزاری است که از سیستم ورژن کنترل گیت استفاده می‌کند.",
+
+            // --- دسته: تشکر و پایان مکالمه ---
+            "ممنون": "خواهش می‌کنم! خوشحالم که توانستم کمک کنم.",
+            "مرسی": "خواهش می‌کنم! وظیفه من کمک کردن به شماست.",
+            "تشکر": "خواهش می‌کنم! اگر سوال دیگری دارید، من در خدمتم.",
+            "لطف کردید": "باعث خوشحالی من است که مفید بوده‌ام.",
+            "خداحافظ": "خدانگهدار! برای شما آرزوی موفقیت دارم.",
+            "فعلا": "فعلا خدانگهدار. روز خوبی داشته باشید.",
+            "بدرود": "بدرود. به امید دیدار مجدد.",
+
+            // --- دسته: پاسخ‌های عمومی و متفرقه ---
+            "چرا": "این سوال جالبی است! دنیا پر از شگفتی‌هاست و هر پدیده‌ای دلیلی دارد.",
+            "چطور": "هر چیزی روش خاص خودش را دارد. می‌توانم در مورد موضوع خاصی برایتان توضیح دهم؟",
+            "موفق باشی": "ممنونم! شما هم موفق باشید.",
+            "جالبه": "خوشحالم که برایتان جالب است!",
+        // --- دسته: معرفی و هویت (مرتبط با دانشگاه آزاد) ---
+        "سلام": "سلام! من هکتوریا - مصنوعی هستم، دستیار هوشمند دانشجویی شما در دانشگاه آزاد اسلامی. خوش آمدید!",
+        "درود": "درود بر شما! آماده پاسخگویی به سوالات دانشجویی شما هستم.",
+        "کی هستی": "من هکتوریا - مصنوعی هستم، یک هوش مصنوعی که در دانشگاه آزاد اسلامی برای کمک به دانشجویانی مثل شما توسعه یافته.",
+        "سازنده": "من محصول تلاش و خلاقیت دانشجویان دانشگاه آزاد اسلامی هستم و هدفم ارائه خدمات نوین به جامعه دانشگاهی است.",
+        "دانشگاه آزاد": "دانشگاه آزاد اسلامی یکی از بزرگترین مراکز آموزشی در ایران و جهان است. خوشحالم که در این مجموعه خدمت می‌کنم.",
+
+        // --- دسته: امور دانشجویی و دانشگاهی ---
+        "انتخاب واحد": "برای انتخاب واحد هوشمند و بدون دردسر، پیشنهاد می‌کنم از ابزار 'انتخاب واحد هوشمند رشته کامپیوتر' ما استفاده کنید. به شما در رعایت پیش‌نیازها و هم‌نیازها کمک زیادی می‌کنه.",
+        "حذف و اضافه": "زمان حذف و اضافه معمولاً در تقویم آموزشی اعلام می‌شه. حواست به اطلاعیه‌های سایت دانشگاه باشه. در این زمان می‌تونی دروسی که برداشتی رو حذف یا درس جدیدی اضافه کنی.",
+        "استاد": "اساتید دانشگاه راهنماهای مسیر علمی شما هستند. سعی کنید همیشه از دانش و تجربه اون‌ها نهایت استفاده رو ببرید.",
+        "امتحان": "برای آمادگی در امتحانات، پیشنهاد می‌کنم از ابزار 'فلش کارت حرفه‌ای' ما استفاده کنید. مرور دروس باهاش خیلی راحت‌تر می‌شه. موفق باشی!",
+        "پایان‌نامه": "پایان‌نامه یکی از مهم‌ترین بخش‌های دوره تحصیلیه. سعی کن موضوعی رو انتخاب کنی که بهش علاقه داری و با یک استاد راهنمای خوب پیش ببری.",
+        "پروژه": "برای انجام پروژه‌های درسی، مدیریت زمان و تقسیم کارها خیلی مهمه. اگر نیاز به اطلاعات سیستمی داری، ابزار 'اطلاعات سیستم شما' می‌تونه مفید باشه.",
+        "مشروط": "مشروط شدن ممکنه برای هر دانشجویی پیش بیاد. مهم اینه که ناامید نشی و برای ترم بعد با برنامه‌ریزی بهتر جبران کنی. می‌تونی از مشاور تحصیلی دانشگاه هم کمک بگیری.",
+        "فارغ‌التحصیلی": "تبریک میگم! این یکی از بهترین لحظات زندگیه. برای تسویه حساب و انجام کارهای فارغ‌التحصیلی باید به بخش آموزش دانشکده مراجعه کنی.",
+        "جزوه": "داشتن جزوه کامل و مرتب نصف راه موفقیته. سعی کن در کلاس‌ها یادداشت‌برداری کنی یا از جزوات دوستانت استفاده کنی.",
+        "تحقیق": "برای انجام تحقیق، استفاده از منابع معتبر مثل مقالات علمی و کتاب‌های تخصصی خیلی مهمه. کتابخانه دانشگاه و پایگاه‌های داده آنلاین منابع خوبی هستند.",
+        "ارائه": "برای یک ارائه خوب، تسلط بر مطلب، ساخت اسلایدهای جذاب و تمرین زیاد کلید موفقیته. با اعتماد به نفس صحبت کن!",
+        "خوابگاه": "زندگی در خوابگاه تجربه‌های زیادی به همراه داره. سعی کن با هم‌اتاقی‌هات روابط خوبی داشته باشی و به قوانین احترام بذاری.",
+        "سلف": "برای رزرو غذای سلف معمولاً باید از طریق سامانه اتوماسیون تغذیه دانشگاه اقدام کنی.",
+        "شهریه": "پرداخت شهریه برای انتخاب واحد ضروریه. می‌تونی از طریق سامانه آموزشیار یا پورتال دانشجویی دانشگاه اقدام کنی.",
+        "وام دانشجویی": "برای دریافت اطلاعات در مورد انواع وام‌های دانشجویی (شهریه، مسکن و...) و شرایط دریافت اون‌ها، به امور دانشجویی دانشگاه مراجعه کن.",
+
+        // --- دسته: مطالعه و یادگیری ---
+        "درس خوندن": "برای مطالعه موثر، یک محیط آروم پیدا کن، موبایلت رو کنار بذار و از تکنیک‌هایی مثل پومودورو استفاده کن. ابزار 'فلش کارت' ما هم برای مرور عالیه.",
+        "تمرکز": "برای افزایش تمرکز، تکنیک‌های ذهن‌آگاهی (Mindfulness)، ورزش منظم و خواب کافی خیلی موثره. همچنین محیط مطالعه رو خلوت و منظم نگه دار.",
+        "استرس": "استرس امتحان طبیعیه. با برنامه‌ریزی درسی، مرور به موقع و کمی ورزش می‌تونی مدیریتش کنی. به خودت اعتماد داشته باش.",
+        "انگیزه": "برای حفظ انگیزه، اهداف کوچیک و قابل دسترس برای خودت تعیین کن. وقتی بهشون می‌رسی، به خودت پاداش بده. به یاد داشته باش که چرا این مسیر رو شروع کردی.",
+        "شب امتحان": "شب امتحان وقت مرور سریعه، نه یادگیری جدید. خوب بخواب تا سر جلسه آزمون ذهنت آماده باشه. موفق باشی!",
+
+        // --- دسته: رشته کامپیوتر و فناوری ---
+        "کامپیوتر": "رشته کامپیوتر دنیای جذابی از حل مسئله و خلق کردنه. خوشحالم که می‌تونم در این مسیر بهت کمک کنم.",
+        "برنامه نویسی": "برنامه‌نویسی مثل یادگیری یک زبان جدیده. با تمرین و تکرار و انجام پروژه‌های کوچیک می‌تونی در اون استاد بشی.",
+        "الگوریتم": "الگوریتم‌ها قلب علوم کامپیوتر هستند. درک اون‌ها به تو قدرت حل مسائل پیچیده رو می‌ده.",
+        "وبسایت": "طراحی وبسایت ترکیبی از هنر و تکنولوژیه. خوشحالم که در یک وبسایت مفید با شما صحبت می‌کنم.",
+        "گیت هاب": "گیت‌هاب یک ابزار ضروری برای هر برنامه‌نویسه. به کمک اون می‌تونی پروژه‌هات رو مدیریت کنی و با دیگران همکاری کنی.",
+        "باگ": "باگ‌ها بخشی جدانشدنی از برنامه‌نویسی هستن. پیدا کردن و رفع اون‌ها (دیباگ کردن) یک مهارت مهمه.",
+        "امنیت": "امنیت در دنیای دیجیتال خیلی مهمه. اگر به اطلاعات امنیتی سیستمت علاقه داری، ابزار 'اطلاعات سیستم شما' رو چک کن.",
+
+        // --- دسته: تشکر و پایان مکالمه ---
+        "ممنون": "خواهش می‌کنم! خوشحالم که تونستم کمکی کنم. اگه سوال دیگه‌ای داشتی، من همینجا هستم.",
+        "مرسی": "خواهش می‌کنم! وظیفه من کمک به دانشجوهاست.",
+        "تشکر": "خواهش می‌کنم! موفق و پیروز باشی.",
+        "خداحافظ": "خدانگهدار! در تمام مراحل تحصیل برات آرزوی موفقیت دارم.",
+    };
+
+    // نمایش پیام در چت‌باکس
+    const addMessage = (message, sender) => {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', `${sender}-message`);
+        messageElement.innerHTML = message; // Using innerHTML to render links
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    };
+
+    // جستجوی هوشمند برای معرفی ابزارها
+    const findToolResponse = (userMessage) => {
+        for (const tool of allTools) {
+            for (const keyword of tool.keywords) {
+                if (userMessage.includes(keyword)) {
+                    return `عالیه! به نظر میاد دنبال چیزی مرتبط با "${keyword}" هستی. ما ابزار <b>${tool.name}</b> رو داریم که دقیقاً برای همین کاره. <br> ${tool.desc} <br> می‌تونی از <a href="${tool.url}" target="_blank">این لینک</a> بهش دسترسی پیدا کنی.`;
+                }
+            }
+        }
+        return null; // اگر ابزار مرتبطی پیدا نشد
+    };
+
+    // هوش مصنوعی قاعده‌مند
+    const getBotResponse = (userMessage) => {
+        const lowerCaseMessage = userMessage.toLowerCase();
+        
+        // 1. اولویت با جستجوی ابزارها
+        const toolResponse = findToolResponse(lowerCaseMessage);
+        if (toolResponse) {
+            setTimeout(() => addMessage(toolResponse, 'bot'), 500);
+            return;
+        }
+
+        // 2. اگر ابزاری پیدا نشد، جستجو در پایگاه دانش عمومی
+        let botReply = "متاسفانه سوال شما را متوجه نشدم. من یک هوش مصنوعی در حال یادگیری هستم. می‌توانید سوال خود را به شکل دیگری بپرسید؟"; // پاسخ پیش‌فرض
+        for (const keyword in knowledgeBase) {
+            if (lowerCaseMessage.includes(keyword)) {
+                botReply = knowledgeBase[keyword];
+                break;
+            }
+        }
+        
+        setTimeout(() => addMessage(botReply, 'bot'), 500);
+    };
+
+    // مدیریت ارسال پیام
+    const handleSendMessage = () => {
+        const userMessage = userInput.value.trim();
+        if (userMessage) {
+            addMessage(userMessage, 'user');
+            getBotResponse(userMessage);
+            userInput.value = '';
+        }
+    };
+
+    sendBtn.addEventListener('click', handleSendMessage);
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            handleSendMessage();
+        }
+    });
+
+    // پیام خوشامدگویی اولیه
+    addMessage("سلام! من هکتوریا - مصنوعی، دستیار هوشمند شما در دانشگاه آزاد اسلامی هستم. می‌توانید سوالات خود را بپرسید یا در مورد ابزارهای دانشجویی ما اطلاعات کسب کنید.", "bot");
+});
+    </script>
+</body>
+</html>
