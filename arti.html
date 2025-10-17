@@ -3,410 +3,671 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>هکتوریا - دستیار هوشمند شما</title>
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-
+    <title>Hecturia AI</title>
     <style>
-        /* --- متغیرهای اصلی طراحی --- */
         :root {
-            --bg-color: #0a0a0a;
-            --text-color: #e5e5e5;
-            --glass-bg: rgba(25, 25, 25, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --neon-blue: #00c6ff;
-            --neon-purple: #9256d9;
-            --font-family: 'Vazirmatn', sans-serif;
-            --error-color: #ff6b6b;
+            --bg-color: #1a1a2e;
+            --primary-color: #16213e;
+            --secondary-color: #0f3460;
+            --accent-icy-blue: #89cff0;
+            --accent-icy-purple: #c3aed6;
+            --text-color: #e0e0e0;
+            --glass-bg: rgba(22, 33, 62, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.18);
         }
 
-        /* --- استایل‌های کلی و بازنشانی --- */
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         * {
             box-sizing: border-box;
-            scrollbar-width: thin;
-            scrollbar-color: var(--neon-blue) var(--bg-color);
-        }
-        
-        /* استایل اسکرول‌بار سفارشی برای مرورگرهای Webkit */
-        *::-webkit-scrollbar { width: 8px; }
-        *::-webkit-scrollbar-track { background: #1a1a1a; }
-        *::-webkit-scrollbar-thumb {
-            background-color: var(--neon-blue);
-            border-radius: 10px;
-            border: 2px solid #1a1a1a;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: var(--font-family);
+            font-family: 'Vazirmatn', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             overflow: hidden;
-            line-height: 1.8;
+            background: linear-gradient(45deg, var(--bg-color), #2c3e50);
+        }
+
+        .chat-container {
+            width: 95%;
+            max-width: 800px;
+            height: 90vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            overflow: hidden;
         }
 
-        /* --- پس زمینه متحرک ذرات --- */
-        .background-drops {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
-        }
-        .drop { position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.3; }
-        .d1 { background-color: #89f7fe; width: 350px; height: 350px; top: -10%; left: -5%; animation: move 35s infinite alternate; }
-        .d2 { background-color: #d299ff; width: 450px; height: 450px; top: 40%; right: -15%; animation: move 40s infinite alternate-reverse; }
-        .d3 { background-color: #ff8c8c; width: 300px; height: 300px; bottom: -12%; left: 20%; animation: move 38s infinite alternate; }
-        .d4 { background-color: #fff2a8; width: 400px; height: 400px; bottom: 5%; right: 15%; animation: move 32s infinite alternate-reverse; }
-        .d5 { background-color: #ff9a76; width: 250px; height: 250px; top: 10%; right: 40%; animation: move 45s infinite alternate; }
-        @keyframes move {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            100% { transform: translate(150px, -120px) scale(1.3) rotate(90deg); }
-        }
-
-        /* --- ساختار اصلی و کارت شیشه‌ای --- */
-        .container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 2rem 1rem; overflow: hidden; }
-        .glass-card {
-            width: 100%; max-width: 800px; background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 20px; backdrop-filter: blur(18px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-            padding: 2rem; display: flex; flex-direction: column; height: 90vh; max-height: 900px;
-        }
-        .card-header { text-align: center; margin-bottom: 1.5rem; flex-shrink: 0; }
-        .card-header h1 { margin: 0; font-size: 2.2rem; }
-        .card-header p { margin: 0.5rem 0 0; color: #a0a0a0; }
-
-        /* --- **تغییر اصلی اینجا است** بخش چت و پیام‌ها --- */
-        #chat-container { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
-        #chat-box { flex-grow: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
-        
-        .message { padding: 0.8rem 1.2rem; border-radius: 15px; max-width: 85%; line-break: anywhere; animation: fadeIn 0.5s ease; }
-        .user-message { background-color: var(--neon-blue); color: #000; align-self: flex-end; border-bottom-right-radius: 3px; }
-        .bot-message { background-color: #2c2c2c; align-self: flex-start; border-bottom-left-radius: 3px; }
-        .bot-message b { color: var(--neon-blue); }
-        .bot-message a { color: #87CEEB; text-decoration: none; font-weight: bold; }
-        .bot-message.error-message { background-color: rgba(255, 107, 107, 0.2); border: 1px solid var(--error-color); }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- **تغییر اصلی اینجا است** بخش ورودی‌ها --- */
-        .input-container { margin-top: 1rem; flex-shrink: 0; } /* از رشد و کوچک شدن جلوگیری می‌کند */
-        
-        #main-input-container { display: flex; gap: 0.5rem; }
-        #learning-interface { display: none; /* در ابتدا کاملاً مخفی */ flex-direction: column; gap: 0.5rem; }
-
-        #user-input, .learning-inputs input, .learning-inputs textarea {
-            flex-grow: 1; padding: 0.9rem; border: 1px solid var(--glass-border); border-radius: 12px;
-            background: rgba(0, 0, 0, 0.4); color: var(--text-color); font-family: var(--font-family); font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        #user-input:focus, .learning-inputs input:focus, .learning-inputs textarea:focus {
-            outline: none; border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
+        .chat-header {
+            padding: 20px;
+            background: rgba(15, 52, 96, 0.5);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        button {
-            padding: 0.9rem 1.7rem; border: none; border-radius: 12px; font-family: var(--font-family); cursor: pointer;
-            transition: all 0.3s ease; font-size: 1rem; font-weight: bold;
+        .chat-header h2 {
+            color: var(--accent-icy-blue);
+            text-shadow: 0 0 5px var(--accent-icy-blue);
         }
-        button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
-        #send-btn, #save-learn-btn { background-color: var(--neon-blue); color: #000; }
-        #send-btn:hover, #save-learn-btn:hover { background-color: #00b0e0; }
-        #cancel-learn-btn { background-color: #444; color: var(--text-color); }
-        #cancel-learn-btn:hover { background-color: #666; }
 
-        .learning-inputs { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
-        .learning-inputs textarea { min-height: 120px; resize: vertical; }
-        .learning-buttons { display: flex; gap: 0.5rem; margin-top: 0.5rem; width: 100%; }
-        .learning-buttons button { flex-grow: 1; }
-
-        /* --- فوتر --- */
-        footer { text-align: center; padding: 1.5rem; color: #777; }
-        .footer-line { height: 1px; background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), transparent); margin-bottom: 1rem; }
-
-        /* --- واکنش‌گرایی --- */
-        @media (max-width: 768px) {
-            .glass-card { height: 95vh; padding: 1.5rem; }
-            .card-header h1 { font-size: 1.8rem; }
-            button { padding: 0.8rem 1.2rem; }
-            .message { max-width: 90%; }
+        .backup-controls button {
+            background: none;
+            border: 1px solid var(--accent-icy-purple);
+            color: var(--accent-icy-purple);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 10px;
         }
-        @media (max-width: 480px) {
-             body { overflow: auto; }
-            .container { padding: 1rem 0.5rem; }
-            .glass-card { height: 98vh; padding: 1rem; border-radius: 15px; }
-            .card-header h1 { font-size: 1.6rem; }
-            .card-header p { font-size: 0.9rem; }
+
+        .backup-controls button:hover {
+            background-color: var(--accent-icy-purple);
+            color: var(--primary-color);
+            box-shadow: 0 0 15px var(--accent-icy-purple);
         }
+
+        #file-importer {
+            display: none;
+        }
+        
+        .chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background-color: var(--accent-icy-blue);
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 70%;
+            line-height: 1.6;
+        }
+
+        .user-message {
+            background-color: var(--accent-icy-blue);
+            color: var(--primary-color);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-message {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .ai-message button {
+            background-color: var(--accent-icy-purple);
+            color: var(--primary-color);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .ai-message button:hover {
+            box-shadow: 0 0 15px var(--accent-icy-purple);
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid var(--accent-icy-blue);
+            border-radius: 10px;
+            background-color: var(--glass-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        #send-btn {
+            padding: 12px 25px;
+            border: none;
+            background-color: var(--accent-icy-blue);
+            color: var(--primary-color);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        #send-btn:hover {
+            box-shadow: 0 0 15px var(--accent-icy-blue);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            color: var(--text-color);
+            position: relative;
+        }
+
+        .modal-content h3 {
+            color: var(--accent-icy-blue);
+            margin-bottom: 20px;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .modal-content input, .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--accent-icy-purple);
+            background-color: var(--glass-bg);
+            color: var(--text-color);
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-buttons button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save {
+            background-color: var(--accent-icy-blue);
+            color: var(--primary-color);
+            border: none;
+        }
+        
+        .btn-save:hover {
+            box-shadow: 0 0 15px var(--accent-icy-blue);
+        }
+
+        .btn-cancel {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+        }
+        
+        .btn-add {
+            background-color: var(--accent-icy-purple);
+            color: var(--primary-color);
+            border: none;
+        }
+        
+        .formula-step {
+            border: 1px dashed var(--accent-icy-purple);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
     </style>
 </head>
 <body>
-    <div class="background-drops">
-        <div class="drop d1"></div><div class="drop d2"></div><div class="drop d3"></div><div class="drop d4"></div><div class="drop d5"></div>
-    </div>
 
-    <main class="container">
-        <div class="glass-card">
-            <div class="card-header">
-                <h1>هکتوریا - مصنوعی</h1>
-                <p>دستیار هوشمند دانشجویی، توسعه‌یافته در دانشگاه آزاد اسلامی</p>
-            </div>
-            
-            <!-- **تغییر اصلی اینجا است** -->
-            <div id="chat-container">
-                <div id="chat-box"></div>
-                
-                <!-- رابط کاربری اصلی چت -->
-                <div id="main-input-container" class="input-container">
-                    <input type="text" id="user-input" placeholder="سوال خود را بپرسید یا برای آموزش بنویسید 'یاد بگیر'...">
-                    <button id="send-btn">ارسال</button>
-                </div>
-
-                <!-- رابط کاربری حالت یادگیری -->
-                <div id="learning-interface" class="input-container">
-                    <div class="learning-inputs">
-                        <textarea id="learning-context" placeholder="متن کامل (مثال: پاراگرافی از یک کتاب) را اینجا وارد کنید..."></textarea>
-                        <input type="text" id="learning-keyword" placeholder="کلمه کلیدی اصلی این متن (مثال: حسن)">
-                    </div>
-                    <div class="learning-buttons">
-                        <button id="cancel-learn-btn">انصراف</button>
-                        <button id="save-learn-btn">ذخیره کن</button>
-                    </div>
-                </div>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Hecturia AI</h2>
+            <div class="backup-controls">
+                <button id="import-btn">بارگذاری دانش</button>
+                <input type="file" id="file-importer" accept=".hfc">
+                <button id="export-btn">پشتیبان‌گیری</button>
             </div>
         </div>
-    </main>
+        <div class="chat-box" id="chat-box">
+            </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="پیام خود را بنویسید...">
+            <button id="send-btn">ارسال</button>
+        </div>
+    </div>
+
+    <div id="learningModal" class="modal">
+        <div class="modal-content">
+            <h3>یادگیری مکالمه جدید</h3>
+            <label for="new-question">سوالی که متوجه نشدم:</label>
+            <input type="text" id="new-question" readonly>
+            
+            <label for="new-answers">جواب(های) صحیح (برای چند جواب، هر کدام را در یک خط جدید بنویسید):</label>
+            <textarea id="new-answers" rows="4" placeholder="مثلا:\nممنون، خوبم.\nعالی‌ام، تو چطوری؟"></textarea>
+            
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal('learningModal')">انصراف</button>
+                <button class="btn-save" onclick="saveNewQA()">ذخیره</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="formulaModal" class="modal">
+        <div class="modal-content">
+            <h3>افزودن فرمول جدید فیزیک</h3>
+            <label for="formula-name">نام فرمول:</label>
+            <input type="text" id="formula-name" placeholder="مثال: تبدیل سانتی‌متر به متر">
+
+            <div id="formula-steps-container">
+                </div>
+            
+            <button class="btn-add" onclick="addFormulaStep()">+ افزودن متغیر یا عملیات</button>
+            
+            <label for="formula-output">فرمت نمایش نتیجه:</label>
+            <input type="text" id="formula-output" placeholder="مثال: {نتیجه} متر">
+            
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal('formulaModal')">انصراف</button>
+                <button class="btn-save" onclick="saveNewFormula()">ذخیره فرمول</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="encryptionModal" class="modal">
+        <div class="modal-content">
+            <h3>ساخت/استفاده از رمزنگار</h3>
+            <label for="cipher-name">نام رمز:</label>
+            <input type="text" id="cipher-name" placeholder="مثال: انیگما شخصی من">
+            
+            <label>قوانین رمزنگاری (جایگزینی حروف):</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="cipher-from" placeholder="حروف اصلی: ابپتثج">
+                <input type="text" id="cipher-to" placeholder="حروف جایگزین: تپبثاج">
+            </div>
+            <p style="font-size: 12px; margin-top: -10px; margin-bottom: 15px;">طول دو رشته باید یکسان باشد.</p>
+            <button class="btn-save" onclick="saveCipher()">ذخیره رمز</button>
+            <hr style="margin: 20px 0; border-color: var(--glass-border);">
+            
+            <select id="cipher-selector" style="width: 100%; padding: 10px; margin-bottom: 10px; background: var(--glass-bg); color: var(--text-color); border: 1px solid var(--accent-icy-purple);"></select>
+
+            <textarea id="cipher-text" rows="3" placeholder="متن برای رمزنگاری یا رمزگشایی..."></textarea>
+            
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal('encryptionModal')">بستن</button>
+                <button class="btn-add" onclick="performCipher(false)">رمزگشایی</button>
+                <button class="btn-save" onclick="performCipher(true)">رمزنگاری</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- انتخابگرهای عناصر DOM ---
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
-        const mainInputContainer = document.getElementById('main-input-container');
-        const learningInterface = document.getElementById('learning-interface');
-        const learningContext = document.getElementById('learning-context');
-        const learningKeyword = document.getElementById('learning-keyword');
-        const saveLearnBtn = document.getElementById('save-learn-btn');
-        const cancelLearnBtn = document.getElementById('cancel-learn-btn');
 
-        // --- کلید ذخیره‌سازی محلی ---
-        const LOCAL_STORAGE_KEY = 'hectoriaLearnedContext_v2';
-
-        // --- لیست بسیار جامع کلمات اضافی فارسی (Stop Words) ---
-        const stopWords = [
-            'از','به','با','در','بر','برای','تا','که','و','یا','اما','اگر','چون','را','این','آن','اینجا','آنجا','هر','همه','هیچ','یک','دیگر','نیز','خود','شان',
-            'من','تو','او','ما','شما','ایشان','آنها','بود','شد','است','هست','نیست','می‌شود','می‌کند','می‌دهد','دارد','کرد','کنند','کنند','کنند','بودند','رفته',
-            'آمده','باشند','باشم','باشی','باشیم','باشید','چه','چرا','کی','کجا','چگونه','کدام','آیا','ولی','پس','فقط','حتی','باید','شاید','یعنی','مثل','مانند',
-            'روی','زیر','کنار','بین','بعد','قبل','سپس','همچنین','البته','واقعا','اصلا','معمولا','بسیار','خیلی','کم','زیاد','هرگز','همیشه','گاهی',
-            'از','به','با','در','بر','برای','تا','که','و','یا','اما','اگر','چون','را','این','آن','اینجا','آنجا','هر','همه','هیچ','یک','دیگر','نیز','خود','شان',
-            'من','تو','او','ما','شما','ایشان','آنها','بود','شد','است','هست','نیست','می‌شود','می‌کند','می‌دهد','دارد','کرد','کنند','کنند','کنند','بودند','رفته',
-            'آمده','باشند','باشم','باشی','باشیم','باشید','چه','چرا','کی','کجا','چگونه','کدام','آیا','ولی','پس','فقط','حتی','باید','شاید','یعنی','مثل','مانند',
-            'روی','زیر','کنار','بین','بعد','قبل','سپس','همچنین','البته','واقعا','اصلا','معمولا','بسیار','خیلی','کم','زیاد','هرگز','همیشه','گاهی'
-
-        ];
-
-        // --- بارگذاری و ذخیره دانش یادگرفته شده ---
-        let learnedContexts = {};
-        const loadLearnedData = () => {
-            const data = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (data) learnedContexts = JSON.parse(data);
-        };
-        const saveLearnedData = () => {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(learnedContexts));
-        };
-
-        // --- پایگاه دانش اولیه بسیار بزرگ و جامع ---
-        const knowledgeBase = {
-            "سلام": "سلام! من هکتوریا - مصنوعی هستم، دستیار هوشمند شما. برای آموزش به من، کافیست بنویسید 'یاد بگیر'.",
-            "درود": "درود بر شما! آماده پاسخگویی به سوالات دانشجویی شما هستم.",
-            "کی هستی": "من هکتوریا - مصنوعی هستم، یک هوش مصنوعی که در دانشگاه آزاد اسلامی برای کمک به دانشجویانی مثل شما توسعه یافته.",
-            "اسمت چیه": "نام من هکتوریا - مصنوعی است.",
-            "سازنده": "من محصول تلاش و خلاقیت دانشجویان دانشگاه آزاد اسلامی هستم و هدفم ارائه خدمات نوین به جامعه دانشگاهی است.",
-            "هدفت چیه": "هدف اصلی من، کمک به شما در مسیر تحصیلی و پاسخ به سوالات شماست. همچنین می‌توانم اطلاعات جدید را از شما یاد بگیرم.",
-            "چطور یاد میگیری": "شما می‌توانید با نوشتن کلمه 'یاد بگیر'، یک متن کامل و یک کلمه کلیدی اصلی به من بدهید. من آن متن را ذخیره می‌کنم و اگر در آینده سوالی مرتبط با آن کلمه کلیدی بپرسید، از آن متن برای پاسخ استفاده می‌کنم.",
-            "دانشگاه آزاد": "دانشگاه آزاد اسلامی یکی از بزرگترین مجموعه‌های آموزشی در ایران است که در اکثر شهرهای کشور واحد دانشگاهی دارد.",
-            "انتخاب واحد": "انتخاب واحد یکی از مهمترین مراحل هر ترم است. حتما چارت درسی و قوانین پیش‌نیاز و هم‌نیاز را از سایت دانشگاه چک کن.",
-            "حذف و اضافه": "معمولاً یک یا دو هفته پس از شروع ترم، بازه زمانی حذف و اضافه اعلام می‌شود تا بتوانید دروس خود را ویرایش کنید.",
-            "شهریه": "پرداخت شهریه (ثابت و متغیر) پیش‌نیاز اصلی برای انجام انتخاب واحد است. می‌توانید از طریق سامانه آموزشیار اقدام کنید.",
-            "وام دانشجویی": "برای دریافت انواع وام‌های تحصیلی، می‌توانید به امور دانشجویی دانشکده خود مراجعه کرده و از شرایط و زمان ثبت‌نام مطلع شوید.",
-            "مشروط": "اگر معدل یک ترم شما زیر ۱۲ شود، مشروط محسوب می‌شوید و در ترم بعد سقف مشخصی برای انتخاب واحد خواهید داشت. نگران نباش، قابل جبران است!",
-            "معدل": "معدل کل تاثیر زیادی در آینده تحصیلی و شغلی شما دارد. سعی کنید با برنامه‌ریزی، نمرات خوبی کسب کنید.",
-            "امتحان": "برای موفقیت در امتحانات، مطالعه در طول ترم، مرور جزوات و حل نمونه سوالات سال‌های قبل بسیار موثر است. موفق باشی!",
-            "پایان نامه": "پایان‌نامه در مقاطع ارشد و دکتری، یک کار تحقیقاتی جامع است. انتخاب موضوع مورد علاقه و یک استاد راهنمای خوب، کلید موفقیت شماست.",
-            "پروژه": "پروژه‌های درسی فرصت خوبی برای تبدیل دانش تئوری به عملی هستند. سعی کنید در انجام آن‌ها خلاقیت به خرج دهید.",
-            "آموزش": "اداره آموزش مسئول تمام امور درسی، انتخاب واحد، نمرات و فارغ‌التحصیلی شماست.",
-            "فارغ التحصیلی": "پس از گذراندن تمام واحدهای درسی، باید برای انجام مراحل تسویه حساب به اداره آموزش و مالی مراجعه کنید. تبریک!",
-            "خوابگاه": "برای ثبت‌نام و اطلاعات در مورد خوابگاه، به بخش امور دانشجویی و فرهنگی دانشگاه خود مراجعه کنید.",
-            "سلف": "برای رزرو غذا معمولاً باید از سامانه تغذیه دانشگاه استفاده کنید. فراموش نکنید که از چند روز قبل غذای خود را رزرو کنید.",
-            "کتابخانه": "کتابخانه مرکزی دانشگاه منبع بسیار خوبی برای کتاب‌های درسی و غیردرسی است. با کارت دانشجویی می‌توانید کتاب به امانت بگیرید.",
-            "انجمن علمی": "عضویت در انجمن‌های علمی راهی عالی برای شبکه‌سازی، یادگیری بیشتر و برگزاری رویدادهای علمی و تخصصی است.",
-            "کامپیوتر": "رشته مهندسی کامپیوتر یکی از پرطرفدارترین رشته‌هاست که آینده شغلی روشنی دارد. این رشته ترکیبی از دانش نرم‌افزار، سخت‌افزار و الگوریتم است.",
-            "برنامه نویسی": "برنامه‌نویسی یک مهارت کلیدی در رشته کامپیوتر است. با زبان‌هایی مثل پایتون (Python)، جاوا (Java) و C++ می‌توانید شروع کنید.",
-            "پایتون": "پایتون یک زبان برنامه‌نویسی سطح بالا، ساده و بسیار قدرتمند است که در زمینه‌هایی مثل توسعه وب، هوش مصنوعی و تحلیل داده کاربرد فراوان دارد.",
-            "هوش مصنوعی": "هوش مصنوعی (AI) شاخه‌ای از علوم کامپیوتر است که به ساخت ماشین‌های هوشمند می‌پردازد. من هم یک نمونه ساده از هوش مصنوعی هستم!",
-            "الگوریتم": "الگوریتم یعنی مجموعه‌ای از دستورالعمل‌ها برای حل یک مسئله. درک و طراحی الگوریتم‌ها اساس علوم کامپیوتر است.",
-            "ساختمان داده": "ساختمان داده روشی برای ذخیره و سازماندهی اطلاعات در کامپیوتر است تا بتوان به طور موثر از آن‌ها استفاده کرد. مفاهیمی مثل لیست، پشته و صف از این دسته‌اند.",
-            "گیت": "گیت (Git) یک سیستم کنترل نسخه است که به برنامه‌نویسان کمک می‌کند تاریخچه تغییرات پروژه‌های خود را مدیریت کرده و به صورت تیمی کار کنند.",
-            "گیت هاب": "گیت‌هاب (GitHub) یک پلتفرم میزبانی برای پروژه‌های گیت است که امکانات زیادی برای همکاری و اشتراک‌گذاری کد فراهم می‌کند.",
-            "باگ": "باگ به خطا یا اشکال در یک برنامه کامپیوتری گفته می‌شود. فرآیند پیدا کردن و رفع باگ را دیباگینگ می‌نامند.",
-            "ممنون": "خواهش می‌کنم! خوشحالم که توانستم مفید باشم. اگر سوال دیگری داشتی، من همیشه اینجا هستم.",
-            "مرسی": "خواهش می‌کنم! موفق و پیروز باشی.",
-            "تشکر": "وظیفه من کمک به شماست. باعث افتخار است.",
-            "خداحافظ": "خدانگهدار! در تمام مراحل تحصیل برای شما آرزوی موفقیت دارم.",
-            "بدرود": "بدرود، به امید دیدار مجدد.",            "سلام": "سلام! من هکتوریا - مصنوعی هستم، دستیار هوشمند شما. برای آموزش به من، کافیست بنویسید 'یاد بگیر'.",
-            "درود": "درود بر شما! آماده پاسخگویی به سوالات دانشجویی شما هستم.",
-            "کی هستی": "من هکتوریا - مصنوعی هستم، یک هوش مصنوعی که در دانشگاه آزاد اسلامی برای کمک به دانشجویانی مثل شما توسعه یافته.",
-            "اسمت چیه": "نام من هکتوریا - مصنوعی است.",
-            "سازنده": "من محصول تلاش و خلاقیت دانشجویان دانشگاه آزاد اسلامی هستم و هدفم ارائه خدمات نوین به جامعه دانشگاهی است.",
-            "هدفت چیه": "هدف اصلی من، کمک به شما در مسیر تحصیلی و پاسخ به سوالات شماست. همچنین می‌توانم اطلاعات جدید را از شما یاد بگیرم.",
-            "چطور یاد میگیری": "شما می‌توانید با نوشتن کلمه 'یاد بگیر'، یک متن کامل و یک کلمه کلیدی اصلی به من بدهید. من آن متن را ذخیره می‌کنم و اگر در آینده سوالی مرتبط با آن کلمه کلیدی بپرسید، از آن متن برای پاسخ استفاده می‌کنم.",
-            // دسته: امور دانشگاهی و تحصیلی
-            "دانشگاه آزاد": "دانشگاه آزاد اسلامی یکی از بزرگترین مجموعه‌های آموزشی در ایران است که در اکثر شهرهای کشور واحد دانشگاهی دارد.",
-            "انتخاب واحد": "انتخاب واحد یکی از مهمترین مراحل هر ترم است. حتما چارت درسی و قوانین پیش‌نیاز و هم‌نیاز را از سایت دانشگاه چک کن.",
-            "حذف و اضافه": "معمولاً یک یا دو هفته پس از شروع ترم، بازه زمانی حذف و اضافه اعلام می‌شود تا بتوانید دروس خود را ویرایش کنید.",
-            "شهریه": "پرداخت شهریه (ثابت و متغیر) پیش‌نیاز اصلی برای انجام انتخاب واحد است. می‌توانید از طریق سامانه آموزشیار اقدام کنید.",
-            "وام دانشجویی": "برای دریافت انواع وام‌های تحصیلی، می‌توانید به امور دانشجویی دانشکده خود مراجعه کرده و از شرایط و زمان ثبت‌نام مطلع شوید.",
-            "مشروط": "اگر معدل یک ترم شما زیر ۱۲ شود، مشروط محسوب می‌شوید و در ترم بعد سقف مشخصی برای انتخاب واحد خواهید داشت. نگران نباش، قابل جبران است!",
-            "معدل": "معدل کل تاثیر زیادی در آینده تحصیلی و شغلی شما دارد. سعی کنید با برنامه‌ریزی، نمرات خوبی کسب کنید.",
-            "امتحان": "برای موفقیت در امتحانات، مطالعه در طول ترم، مرور جزوات و حل نمونه سوالات سال‌های قبل بسیار موثر است. موفق باشی!",
-            "پایان نامه": "پایان‌نامه در مقاطع ارشد و دکتری، یک کار تحقیقاتی جامع است. انتخاب موضوع مورد علاقه و یک استاد راهنمای خوب، کلید موفقیت شماست.",
-            "پروژه": "پروژه‌های درسی فرصت خوبی برای تبدیل دانش تئوری به عملی هستند. سعی کنید در انجام آن‌ها خلاقیت به خرج دهید.",
-            "آموزش": "اداره آموزش مسئول تمام امور درسی، انتخاب واحد، نمرات و فارغ‌التحصیلی شماست.",
-            "فارغ التحصیلی": "پس از گذراندن تمام واحدهای درسی، باید برای انجام مراحل تسویه حساب به اداره آموزش و مالی مراجعه کنید. تبریک!",
-            // دسته: زندگی دانشجویی
-            "خوابگاه": "برای ثبت‌نام و اطلاعات در مورد خوابگاه، به بخش امور دانشجویی و فرهنگی دانشگاه خود مراجعه کنید.",
-            "سلف": "برای رزرو غذا معمولاً باید از سامانه تغذیه دانشگاه استفاده کنید. فراموش نکنید که از چند روز قبل غذای خود را رزرو کنید.",
-            "کتابخانه": "کتابخانه مرکزی دانشگاه منبع بسیار خوبی برای کتاب‌های درسی و غیردرسی است. با کارت دانشجویی می‌توانید کتاب به امانت بگیرید.",
-            "انجمن علمی": "عضویت در انجمن‌های علمی راهی عالی برای شبکه‌سازی، یادگیری بیشتر و برگزاری رویدادهای علمی و تخصصی است.",
-            // دسته: رشته کامپیوتر و فناوری
-            "کامپیوتر": "رشته مهندسی کامپیوتر یکی از پرطرفدارترین رشته‌هاست که آینده شغلی روشنی دارد. این رشته ترکیبی از دانش نرم‌افزار، سخت‌افزار و الگوریتم است.",
-            "برنامه نویسی": "برنامه‌نویسی یک مهارت کلیدی در رشته کامپیوتر است. با زبان‌هایی مثل پایتون (Python)، جاوا (Java) و C++ می‌توانید شروع کنید.",
-            "پایتون": "پایتون یک زبان برنامه‌نویسی سطح بالا، ساده و بسیار قدرتمند است که در زمینه‌هایی مثل توسعه وب، هوش مصنوعی و تحلیل داده کاربرد فراوان دارد.",
-            "هوش مصنوعی": "هوش مصنوعی (AI) شاخه‌ای از علوم کامپیوتر است که به ساخت ماشین‌های هوشمند می‌پردازد. من هم یک نمونه ساده از هوش مصنوعی هستم!",
-            "الگوریتم": "الگوریتم یعنی مجموعه‌ای از دستورالعمل‌ها برای حل یک مسئله. درک و طراحی الگوریتم‌ها اساس علوم کامپیوتر است.",
-            "ساختمان داده": "ساختمان داده روشی برای ذخیره و سازماندهی اطلاعات در کامپیوتر است تا بتوان به طور موثر از آن‌ها استفاده کرد. مفاهیمی مثل لیست، پشته و صف از این دسته‌اند.",
-            "گیت": "گیت (Git) یک سیستم کنترل نسخه است که به برنامه‌نویسان کمک می‌کند تاریخچه تغییرات پروژه‌های خود را مدیریت کرده و به صورت تیمی کار کنند.",
-            "گیت هاب": "گیت‌هاب (GitHub) یک پلتفرم میزبانی برای پروژه‌های گیت است که امکانات زیادی برای همکاری و اشتراک‌گذاری کد فراهم می‌کند.",
-            "باگ": "باگ به خطا یا اشکال در یک برنامه کامپیوتری گفته می‌شود. فرآیند پیدا کردن و رفع باگ را دیباگینگ می‌نامند.",
-            // دسته: تشکر و پایان مکالمه
-            "ممنون": "خواهش می‌کنم! خوشحالم که توانستم مفید باشم. اگر سوال دیگری داشتی، من همیشه اینجا هستم.",
-            "مرسی": "خواهش می‌کنم! موفق و پیروز باشی.",
-            "تشکر": "وظیفه من کمک به شماست. باعث افتخار است.",
-            "خداحافظ": "خدانگهدار! در تمام مراحل تحصیل برای شما آرزوی موفقیت دارم.",
-            "بدرود": "بدرود، به امید دیدار مجدد."
+        let hecturiaDB = {
+            qa: {},
+            formulas: {},
+            ciphers: {}
         };
         
-        const addMessage = (message, sender, isError = false) => {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', `${sender}-message`);
-            if (isError) messageElement.classList.add('error-message');
-            messageElement.innerHTML = message;
-            chatBox.appendChild(messageElement);
-            chatBox.scrollTop = chatBox.scrollHeight;
+        const initialQA = {
+            "سلام": ["سلام! چطور میتونم کمکت کنم؟", "درود بر شما!", "سلام، من هکتوریا هستم."],
+            "خوبی": ["ممنون که پرسیدی! من یک هوش مصنوعی هستم و همیشه در بهترین حالت قرار دارم.", "عالی‌ام! آماده‌ام تا بهت کمک کنم."],
+            "چه خبر": ["همه چیز تحت کنترله!", "خبر خاصی نیست، منتظر دستورات شما هستم."],
+            "اسمت چیه": ["من هکتوریا هستم.", "اسم من هکتوریا است."],
+            "کجایی": ["من در دستگاه شما و آماده به خدمت هستم!", "من همه جا و هیچ جا نیستم. یک کد در سیستم شما."]
         };
 
-        // --- **تابع جدید و اصلاح شده** برای تغییر حالت ---
-        const toggleLearningMode = (enable) => {
-            if (enable) {
-                mainInputContainer.style.display = 'none';
-                learningInterface.style.display = 'flex';
-                learningContext.focus();
+        function loadDB() {
+            const db = localStorage.getItem('hecturiaDB');
+            if (db) {
+                hecturiaDB = JSON.parse(db);
             } else {
-                learningInterface.style.display = 'none';
-                mainInputContainer.style.display = 'flex';
-                userInput.value = '';
-                userInput.focus();
+                hecturiaDB.qa = initialQA;
             }
-        };
+        }
 
-        const cleanText = (text) => {
-            let words = text.split(/[\s,،.؟?]+/);
-            words = words.filter(word => !stopWords.includes(word.toLowerCase()));
-            return words.join(' ');
-        };
+        function saveDB() {
+            localStorage.setItem('hecturiaDB', JSON.stringify(hecturiaDB));
+        }
 
-        const getBotResponse = (userMessage) => {
-            const lowerCaseMessage = userMessage.toLowerCase().trim();
-            const cleanedQuery = cleanText(lowerCaseMessage);
-
-            for (const mainKeyword in learnedContexts) {
-                if (cleanedQuery.includes(mainKeyword)) {
-                    const context = learnedContexts[mainKeyword];
-                    const sentences = context.match(/[^.!?]+[.!?]+/g) || [context];
-                    let relevantSentence = `در متنی که در مورد "<b>${mainKeyword}</b>" به من آموختی، اطلاعات مرتبطی پیدا کردم: <br>"${context}"`;
-                    for (const sentence of sentences) {
-                        if (sentence.toLowerCase().includes(mainKeyword)) {
-                            relevantSentence = `براساس متنی که در مورد "<b>${mainKeyword}</b>" به من آموزش دادی: <br>"${sentence.trim()}"`;
-                            break;
-                        }
-                    }
-                    addMessage(relevantSentence, 'bot');
-                    return;
-                }
+        function addMessage(text, sender, contentHTML = '') {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${sender}-message`);
+            if (contentHTML) {
+                messageDiv.innerHTML = contentHTML;
+            } else {
+                messageDiv.textContent = text;
             }
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
-            let bestMatch = '';
-            for (const keyword in knowledgeBase) {
-                if (lowerCaseMessage.includes(keyword)) {
-                    if (keyword.length > bestMatch.length) {
-                        bestMatch = keyword;
-                    }
-                }
+        function getAIResponse(query) {
+            query = query.trim();
+
+            // Keyword triggers
+            if (query.includes("فیزیک")) {
+                return handlePhysics();
             }
-            if (bestMatch) {
-                addMessage(knowledgeBase[bestMatch], 'bot');
+            if (query.includes("رمزنگاری") || query.includes("رمز")) {
+                return handleEncryption();
+            }
+            if (query.includes("یادگیری")) {
+                addMessage("برای یادگیری، کافیه چیزی از من بپرسید که بلد نیستم. خودم ازتون می‌خوام که بهم یاد بدید!", 'ai');
                 return;
             }
 
-            addMessage("متاسفانه پاسخ دقیقی برای این سوال پیدا نکردم. می‌توانید با استفاده از دستور '<b>یاد بگیر</b>' این موضوع را به من آموزش دهید.", 'bot');
-        };
-
-        const handleSendMessage = () => {
-            const userMessage = userInput.value.trim();
-            if (userMessage) {
-                addMessage(userMessage, 'user');
-                setTimeout(() => getBotResponse(userMessage), 400);
-                userInput.value = '';
+            // General QA
+            for (const key in hecturiaDB.qa) {
+                if (query.includes(key)) {
+                    const answers = hecturiaDB.qa[key];
+                    const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
+                    return randomAnswer;
+                }
             }
-        };
+            
+            // Not found
+            const learnButtonId = `learn-btn-${Date.now()}`;
+            const responseText = `متاسفم، من جواب این سوال رو نمی‌دونم. \n<button id="${learnButtonId}" data-question="${query}">یادگیری</button>`;
+            addMessage('', 'ai', responseText);
 
-        userInput.addEventListener('input', () => {
-            const text = userInput.value.trim();
-            if (/^یاد\s*بگیر:?$/.test(text) || /^learn:?$/.test(text.toLowerCase())) {
-                toggleLearningMode(true);
-            }
-        });
+            setTimeout(() => {
+                const learnBtn = document.getElementById(learnButtonId);
+                if (learnBtn) {
+                    learnBtn.onclick = () => {
+                        openLearningModal(learnBtn.dataset.question);
+                    };
+                }
+            }, 100);
+        }
 
-        sendBtn.addEventListener('click', handleSendMessage);
+        function handleSend() {
+            const userText = userInput.value;
+            if (!userText.trim()) return;
+
+            addMessage(userText, 'user');
+            userInput.value = '';
+
+            setTimeout(() => {
+                const aiResponse = getAIResponse(userText);
+                if (aiResponse) {
+                    addMessage(aiResponse, 'ai');
+                }
+            }, 500);
+        }
+
+        sendBtn.addEventListener('click', handleSend);
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSendMessage();
-        });
-
-        saveLearnBtn.addEventListener('click', () => {
-            const context = learningContext.value.trim();
-            const keyword = learningKeyword.value.trim().toLowerCase();
-            if (context && keyword) {
-                learnedContexts[keyword] = context;
-                saveLearnedData();
-                addMessage(`بسیار خب! متن مربوط به "<b>${keyword}</b>" را با موفقیت یاد گرفتم. حالا می‌توانی در موردش از من سوال بپرسی.`, 'bot');
-                learningContext.value = '';
-                learningKeyword.value = '';
-                toggleLearningMode(false);
-            } else {
-                 addMessage('خطا: لطفاً هر دو فیلد "متن کامل" و "کلمه کلیدی اصلی" را پر کنید.', 'bot', true);
+            if (e.key === 'Enter') {
+                handleSend();
             }
         });
 
-        cancelLearnBtn.addEventListener('click', () => {
-            toggleLearningMode(false);
+        // --- Modal Logic ---
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // --- Learning Module ---
+        function openLearningModal(question) {
+            document.getElementById('new-question').value = question;
+            document.getElementById('new-answers').value = '';
+            openModal('learningModal');
+        }
+
+        function saveNewQA() {
+            const question = document.getElementById('new-question').value.trim();
+            const answersRaw = document.getElementById('new-answers').value.trim();
+            if (!question || !answersRaw) return;
+
+            const answers = answersRaw.split('\n').map(a => a.trim()).filter(a => a);
+            hecturiaDB.qa[question] = answers;
+            saveDB();
+            
+            addMessage(`بسیار خب! یاد گرفتم که در جواب "${question}" چه بگویم.`, 'ai');
+            closeModal('learningModal');
+        }
+        
+        // --- Physics Module ---
+        function handlePhysics() {
+            let response = "بله، می‌توانم در زمینه فیزیک کمک کنم.<br>فرمول‌هایی که بلدم:";
+            if(Object.keys(hecturiaDB.formulas).length > 0) {
+                 response += "<ul>";
+                 for(const name in hecturiaDB.formulas) {
+                     response += `<li>${name}</li>`;
+                 }
+                 response += "</ul>";
+            } else {
+                response += "<br>در حال حاضر هیچ فرمولی بلد نیستم.";
+            }
+            response += `<br><button onclick="openFormulaModal()">افزودن فرمول جدید</button>`;
+            addMessage("", "ai", response);
+        }
+
+        function openFormulaModal() {
+            document.getElementById('formula-name').value = '';
+            document.getElementById('formula-steps-container').innerHTML = '';
+            document.getElementById('formula-output').value = '';
+            openModal('formulaModal');
+        }
+
+        let stepCounter = 0;
+        function addFormulaStep() {
+            stepCounter++;
+            const container = document.getElementById('formula-steps-container');
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'formula-step';
+            stepDiv.innerHTML = `
+                <label>مرحله ${stepCounter}:</label>
+                <select onchange="updateStepType(this)">
+                    <option value="variable">تعریف متغیر</option>
+                    <option value="operation">انجام عملیات</option>
+                </select>
+                <div class="step-details">
+                    <input type="text" class="step-input" placeholder="نام متغیر (مثال: سانتی‌متر)">
+                </div>
+            `;
+            container.appendChild(stepDiv);
+        }
+        
+        function updateStepType(selectElement) {
+            const detailsDiv = selectElement.nextElementSibling;
+            if (selectElement.value === 'variable') {
+                detailsDiv.innerHTML = `<input type="text" class="step-input" placeholder="نام متغیر (مثال: سانتی‌متر)">`;
+            } else {
+                detailsDiv.innerHTML = `<input type="text" class="step-input" placeholder="عملیات (مثال: var1 / 100)">`;
+            }
+        }
+        
+        function saveNewFormula() {
+            const name = document.getElementById('formula-name').value.trim();
+            const output = document.getElementById('formula-output').value.trim();
+            if(!name || !output) return;
+            
+            const steps = [];
+            const stepDivs = document.querySelectorAll('#formula-steps-container .formula-step');
+            stepDivs.forEach(div => {
+                const type = div.querySelector('select').value;
+                const value = div.querySelector('.step-input').value.trim();
+                steps.push({ type, value });
+            });
+            
+            hecturiaDB.formulas[name] = { steps, output };
+            saveDB();
+            addMessage(`فرمول "${name}" با موفقیت ذخیره شد.`, 'ai');
+            closeModal('formulaModal');
+        }
+
+        // --- Encryption Module ---
+        function handleEncryption() {
+            updateCipherSelector();
+            openModal('encryptionModal');
+            return "ماژول رمزنگاری برای شما باز شد.";
+        }
+        
+        function saveCipher() {
+            const name = document.getElementById('cipher-name').value.trim();
+            const from = document.getElementById('cipher-from').value;
+            const to = document.getElementById('cipher-to').value;
+            
+            if (!name || !from || !to || from.length !== to.length) {
+                alert("لطفا نام رمز و حروف اصلی و جایگزین را به درستی وارد کنید. طول حروف باید یکسان باشد.");
+                return;
+            }
+            
+            hecturiaDB.ciphers[name] = { from, to };
+            saveDB();
+            alert(`رمز "${name}" ذخیره شد.`);
+            updateCipherSelector();
+        }
+        
+        function updateCipherSelector() {
+            const selector = document.getElementById('cipher-selector');
+            selector.innerHTML = '';
+            for (const name in hecturiaDB.ciphers) {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                selector.appendChild(option);
+            }
+        }
+        
+        function performCipher(encrypt) {
+            const cipherName = document.getElementById('cipher-selector').value;
+            const text = document.getElementById('cipher-text').value;
+            if (!cipherName || !text) return;
+            
+            const cipher = hecturiaDB.ciphers[cipherName];
+            let from, to;
+            if (encrypt) {
+                [from, to] = [cipher.from, cipher.to];
+            } else {
+                [from, to] = [cipher.to, cipher.from];
+            }
+            
+            const map = {};
+            for (let i = 0; i < from.length; i++) {
+                map[from[i]] = to[i];
+            }
+            
+            const result = text.split('').map(char => map[char] || char).join('');
+            document.getElementById('cipher-text').value = result;
+        }
+
+        // --- Backup & Restore ---
+        const exportBtn = document.getElementById('export-btn');
+        const importBtn = document.getElementById('import-btn');
+        const fileImporter = document.getElementById('file-importer');
+
+        exportBtn.addEventListener('click', () => {
+            const dataStr = JSON.stringify(hecturiaDB, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hecturia_backup.hfc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            addMessage("پشتیبان‌گیری از دانش با موفقیت انجام شد.", 'ai');
+        });
+        
+        importBtn.addEventListener('click', () => fileImporter.click());
+
+        fileImporter.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedDB = JSON.parse(e.target.result);
+                    // Basic validation
+                    if ('qa' in importedDB && 'formulas' in importedDB && 'ciphers' in importedDB) {
+                        hecturiaDB = importedDB;
+                        saveDB();
+                        addMessage("دانش جدید با موفقیت بارگذاری و جایگزین شد!", 'ai');
+                    } else {
+                        throw new Error("Invalid file format");
+                    }
+                } catch (error) {
+                    addMessage("خطا: فایل پشتیبان معتبر نیست.", 'ai');
+                }
+            };
+            reader.readAsText(file);
+            fileImporter.value = ''; // Reset for next import
         });
 
-        loadLearnedData();
-        setTimeout(() => {
-            addMessage("سلام! من هکتوریا هستم، دستیار هوشمند شما. از من سوال بپرسید یا با نوشتن '<b>یاد بگیر</b>' دانش جدیدی به من آموزش دهید.", "bot");
-        }, 500);
-    });
+        // --- Initial Load ---
+        window.onload = () => {
+            loadDB();
+            addMessage("سلام! من هکتوریا هستم. چطور میتونم کمکت کنم؟ می‌تونی از من سوال بپرسی یا کلمات کلیدی مثل 'فیزیک' یا 'رمزنگاری' رو امتحان کنی.", 'ai');
+        };
+
     </script>
 </body>
 </html>
-
