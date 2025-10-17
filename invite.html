@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دعوت به جشن دانشجویی</title>
+    
+    <!-- Google Fonts - Vazirmatn for Persian text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- General Setup & Body --- */
+        :root {
+            --primary-glow-color: #00ffff; /* Cyan Neon */
+            --secondary-glow-color: #ff00ff; /* Magenta Neon */
+            --background-color: #0b021a;
+            --glass-background: rgba(18, 5, 43, 0.4);
+            --font-color: #f0f0f0;
+            --subtle-font-color: #cccccc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+            background-color: var(--background-color);
+            color: var(--font-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* --- Background Effects --- */
+        .blur-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .color-blur-element {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.25;
+            filter: blur(150px);
+            animation: soft-move 25s infinite alternate;
+        }
+
+        .blue-ice {
+            width: 400px;
+            height: 400px;
+            background: #00f2ff;
+            top: 10%;
+            left: 5%;
+            animation-duration: 30s;
+        }
+
+        .purple-neon {
+            width: 500px;
+            height: 500px;
+            background: #9d00ff;
+            bottom: 5%;
+            right: 10%;
+            animation-duration: 25s;
+        }
+
+        .green-light {
+            width: 350px;
+            height: 350px;
+            background: #5eff00;
+            top: 20%;
+            right: 30%;
+            animation-duration: 35s;
+        }
+
+        @keyframes soft-move {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+            to {
+                transform: translate(50px, 80px) scale(1.2);
+            }
+        }
+
+
+        /* --- Glassmorphism & Neon Effects --- */
+        .glassmorphic {
+            background: var(--glass-background);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .neon-border {
+            box-shadow: 0 0 5px var(--primary-glow-color),
+                        0 0 15px var(--primary-glow-color),
+                        inset 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+
+        .neon-text-glow {
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 7px #fff,
+                         0 0 10px #fff,
+                         0 0 21px #fff,
+                         0 0 42px var(--primary-glow-color),
+                         0 0 82px var(--primary-glow-color),
+                         0 0 92px var(--primary-glow-color);
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            margin: 1rem;
+        }
+        
+        .navbar .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 5px var(--secondary-glow-color);
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin-right: 25px;
+        }
+        
+        .nav-links a {
+            color: var(--subtle-font-color);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+            text-shadow: 0 0 5px var(--primary-glow-color);
+        }
+
+
+        /* --- Main Content Area --- */
+        .content-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 200px);
+            padding: 2rem;
+        }
+
+        #home.glassmorphic-card {
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+        }
+
+        #home h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        #home p {
+            font-size: 1.2rem;
+            color: var(--subtle-font-color);
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        .neon-button {
+            background: transparent;
+            border: 2px solid var(--primary-glow-color);
+            color: var(--primary-glow-color);
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px var(--primary-glow-color), 
+                        inset 0 0 10px var(--primary-glow-color);
+            text-shadow: 0 0 5px var(--primary-glow-color);
+        }
+
+        .neon-button:hover {
+            background: var(--primary-glow-color);
+            color: var(--background-color);
+            box-shadow: 0 0 20px var(--primary-glow-color), 
+                        0 0 40px var(--primary-glow-color);
+        }
+
+        .neon-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* --- Magic Envelope & Invitation Letter --- */
+        #magic-envelope-container {
+            margin-top: 30px;
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: opacity 1s ease, height 0.5s ease;
+            text-align: right;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 30px;
+        }
+        
+        #magic-envelope-container.visible {
+            opacity: 1;
+            height: auto; /* Auto height based on content */
+        }
+        
+        .invitation-letter h2 {
+            font-size: 2rem;
+            color: var(--secondary-glow-color);
+            text-shadow: 0 0 10px var(--secondary-glow-color);
+            margin-bottom: 20px;
+        }
+
+        .invitation-letter p {
+            font-size: 1.1rem;
+            margin-bottom: 15px !important;
+        }
+
+        .invitation-letter .highlight-text {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .invitation-letter strong {
+            color: var(--primary-glow-color);
+            font-weight: 700;
+        }
+        
+        .map-link-button {
+            display: inline-block;
+            background: var(--secondary-glow-color);
+            color: var(--background-color);
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px var(--secondary-glow-color);
+        }
+        
+        .map-link-button:hover {
+             transform: scale(1.05);
+             box-shadow: 0 0 25px var(--secondary-glow-color), 0 0 40px var(--secondary-glow-color);
+        }
+
+        /* --- Footer --- */
+        .main-footer {
+            padding: 2rem 1rem 1rem 1rem;
+            text-align: center;
+        }
+
+        .glow-line-separator {
+            height: 2px;
+            width: 100%;
+            background: linear-gradient(90deg, transparent, var(--primary-glow-color), var(--secondary-glow-color), transparent);
+            margin: 0 auto 1.5rem auto;
+            opacity: 0.7;
+            animation: glow-line-anim 5s linear infinite;
+        }
+
+        @keyframes glow-line-anim {
+            0% {
+                filter: hue-rotate(0deg);
+            }
+            100% {
+                filter: hue-rotate(360deg);
+            }
+        }
+
+        .footer-content {
+            font-size: 0.9rem;
+            color: var(--subtle-font-color);
+        }
+        
+        .footer-links {
+            margin-top: 10px;
+        }
+
+        .footer-links a {
+            color: var(--subtle-font-color);
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-glow-color);
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+            .nav-links {
+                margin-top: 1rem;
+            }
+            .nav-links li {
+                margin: 0 10px;
+            }
+            #home h1 {
+                font-size: 2rem;
+            }
+            #home p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="blur-container">
+        <div class="color-blur-element blue-ice"></div>
+        <div class="color-blur-element purple-neon"></div>
+        <div class="color-blur-element green-light"></div>
+    </div>
+
+    <nav class="navbar glassmorphic">
+        <div class="logo">🪔 جشن هکتوریا</div>
+        <ul class="nav-links">
+            <li><a href="index.html">خانه</a></li>
+
+        </ul>
+    </nav>
+    
+    <main class="content-area">
+        <section id="home" class="glassmorphic-card">
+            <h1 class="neon-text-glow">جشنی از نور در انتظار شماست!</h1>
+            <p>"بیایید این فستیوال را به معنای واقعی جشن بگیریم، با پراکندن شادی و روشن کردن دنیای دیگران."</p>
+            
+            <button id="accept-invite-btn" class="neon-button">پذیرش دعوت</button>
+
+            <div id="magic-envelope-container">
+                <div class="invitation-letter">
+                    <h2 class="letter-title">شما رسماً دعوتید!</h2>
+                    <p>در پس پرده‌ای از زمان، جایی که نور و خیال در هم می‌آمیزند، ماجرا آغاز می‌شود...</p>
+                    <p class="highlight-text">به سرزمینی دعوتید که قوانینش با درخشش نئون نوشته شده!</p>
+                    
+                    <p><strong>شما:</strong> دوست و همراه گرامی، عنصری حیاتی در معماری این شب فراموش‌نشدنی هستید.</p>
+                    <p><strong>رویداد:</strong> <strong>جشن روز دانشجو</strong> - جشن باشکوه دانشجویی</p>
+                    <p><strong>مکان:</strong> دانشکده فنی و مهندسی</p>
+                    <p><strong>زمان:</strong> دوشنبه، 22 مهر - ساعت ۷ شب</p>
+                    
+                    <a href="https://maps.google.com/" target="_blank" class="map-link-button">
+                        <span>📍</span> مسیریابی هوشمند
+                    </a>
+
+                    <p><strong>دستورالعمل:</strong> "با شاد ترین  نسخه از خودتان ظهور کنید."</p>
+                </div>
+            </div>
+            
+        </section>
+    </main>
+    
+    <footer class="main-footer">
+        <div class="glow-line-separator"></div>
+        <div class="footer-content">
+            <p>© تمامی حقوق محفوظ است.هکتوریا</p>
+
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const acceptBtn = document.getElementById('accept-invite-btn');
+            const envelopeContainer = document.getElementById('magic-envelope-container');
+
+            acceptBtn.addEventListener('click', function() {
+                // Play a subtle sound if desired (requires an audio file)
+                // new Audio('path/to/magic-sound.mp3').play();
+                
+                // Disable the button
+                this.disabled = true;
+                this.textContent = "دعوتنامه فعال شد!";
+                
+                // Show the envelope content with a smooth animation
+                // We use a timeout to let the CSS transitions take effect smoothly
+                setTimeout(() => {
+                    envelopeContainer.classList.add('visible');
+                    // Scroll to the invitation smoothly
+                    envelopeContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300); // 300ms delay
+            });
+        });
+    </script>
+</body>
+</html>

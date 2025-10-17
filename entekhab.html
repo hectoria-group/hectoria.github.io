@@ -1,0 +1,679 @@
+<BLOGFA></BLOGFA>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دستیار انتخاب واحد | هکتوریا</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d0d1a;
+            --primary-text: #e0e0e0;
+            --neon-blue: #00e5ff;
+            --neon-purple: #ae00ff;
+            --glass-bg: rgba(30, 30, 50, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --font-family: 'Vazirmatn', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Background Blobs */
+        .bg-blur-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: -1;
+            filter: blur(100px) opacity(0.3);
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 5s ease-in-out;
+            will-change: transform;
+        }
+
+        .blob-1 { width: 400px; height: 400px; background-color: #00e5ff; top: 10%; left: 5%; animation: move 20s infinite alternate; }
+        .blob-2 { width: 300px; height: 300px; background-color: #ae00ff; top: 60%; left: 20%; animation: move 25s infinite alternate; }
+        .blob-3 { width: 250px; height: 250px; background-color: #24ff72; top: 30%; left: 70%; animation: move 22s infinite alternate; }
+        .blob-4 { width: 200px; height: 200px; background-color: #ff5733; top: 80%; left: 80%; animation: move 18s infinite alternate; }
+        .blob-5 { width: 350px; height: 350px; background-color: #f7ff3b; top: -20%; left: 40%; animation: move 28s infinite alternate; }
+
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 50px) scale(1.2) rotate(90deg); }
+        }
+
+        /* Main Content & Containers */
+        main {
+            width: 100%;
+            max-width: 900px;
+            z-index: 1;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            animation: fadeIn 0.7s ease-in-out;
+        }
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 2rem;
+            width: 100%;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .glass-card h1, .glass-card h2 {
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        /* Form Elements */
+        .input-group {
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--primary-text);
+            font-family: var(--font-family);
+            font-size: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: var(--font-family);
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(174, 0, 255, 0.7);
+        }
+
+        /* Course Selection Page */
+        #course-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 15px;
+            width: 100%;
+            direction: rtl; /* For scrollbar */
+        }
+        
+        /* Custom scrollbar for course list */
+        #course-list::-webkit-scrollbar { width: 8px; }
+        #course-list::-webkit-scrollbar-track { background: transparent; }
+        #course-list::-webkit-scrollbar-thumb { background-color: var(--neon-blue); border-radius: 10px; border: 2px solid transparent; }
+
+
+        .course-item {
+            background: rgba(40, 40, 60, 0.6);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .course-item:hover {
+            background: rgba(60, 60, 80, 0.8);
+        }
+
+        .course-item input[type="checkbox"] {
+            margin-left: 15px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .course-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            text-align: right;
+        }
+
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+
+        /* Results Page */
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            text-align: right;
+        }
+        
+        .result-section {
+            width: 100%;
+            padding: 20px;
+        }
+        
+        #user-info {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
+        }
+
+        .suggested-course-card {
+            background: rgba(40, 40, 60, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--neon-blue);
+            font-size: 0.9rem;
+        }
+        
+        .suggested-course-card.not-takable {
+            border-left-color: #ff5733;
+            opacity: 0.6;
+        }
+        
+        .suggested-course-card.not-takable .course-name::after {
+            content: ' (پیش‌نیاز رعایت نشده)';
+            font-size: 0.7rem;
+            color: #ffcdd2;
+        }
+        
+        .course-name { font-weight: bold; }
+        .course-credits { font-size: 0.8rem; opacity: 0.8; margin-top: 5px; }
+
+
+        /* Header & Footer */
+        header { width: 100%; padding: 1.5rem; }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+        
+        .nav-links a {
+            color: var(--primary-text);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-blue);
+        }
+
+        .back-btn {
+            cursor: pointer;
+            background: none;
+            border: 1px solid var(--glass-border);
+            color: var(--primary-text);
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+
+        footer {
+            width: 100%;
+            padding: 2rem 0 1rem 0;
+            text-align: center;
+            font-size: 0.9rem;
+            position: relative;
+            margin-top: 50px;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), var(--neon-blue), transparent);
+            background-size: 200% 100%;
+            animation: glow-line 4s linear infinite;
+        }
+        
+        @keyframes glow-line {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        footer a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .nav-links { display: none; /* Simple hiding for this example */ }
+            .glass-card { padding: 1.5rem; }
+            #course-list { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+            .course-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-blur-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="blob blob-5"></div>
+    </div>
+
+    <header>
+        <nav class="navbar">
+            <button id="back-button" class="back-btn" style="visibility: hidden;">بازگشت</button>
+            <ul class="nav-links">
+                <li><a href="index.html">خانه</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Page 1: Get Name -->
+        <div id="page-name" class="page active">
+            <div class="glass-card">
+                <h1>دستیار هوشمند انتخاب واحد رشته مهندسی کامپیوتر</h1>
+
+                <p style="margin-bottom: 2rem;">برای شروع، نام خود را وارد کنید.</p>
+                <form id="form-name">
+                    <div class="input-group">
+                        <input type="text" id="user-name" class="input-field" placeholder="مثال: علی محمدی" required>
+                    </div>
+                    <button type="submit" class="btn">بعدی</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Page 2: Get GPA -->
+        <div id="page-gpa" class="page">
+            <div class="glass-card">
+                <h1 id="gpa-prompt">، خوش آمدی!</h1>
+                <p style="margin-bottom: 2rem;">لطفاً آخرین معدل کل خود را وارد کنید.</p>
+                <form id="form-gpa">
+                    <div class="input-group">
+                        <input type="number" id="user-gpa" class="input-field" step="0.01" min="0" max="20" placeholder="معدل بین ۰ تا ۲۰" required>
+                    </div>
+                    <button type="submit" class="btn">بعدی</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Page 3: Select Passed Courses -->
+        <div id="page-courses" class="page">
+             <div class="glass-card" style="width:100%;">
+                <h2>دروسی که گذرانده‌اید را انتخاب کنید</h2>
+                <div id="course-list"></div>
+                <button id="confirm-courses-btn" class="btn floating-btn">تایید و مشاهده دروس پیشنهادی</button>
+             </div>
+        </div>
+        
+        <!-- Page 4: Results -->
+        <div id="page-results" class="page">
+            <div class="glass-card results-container">
+                <div id="user-info"></div>
+                
+                <div class="result-section">
+                    <h2>ترم پیشنهادی برای شما: <span id="suggested-term"></span></h2>
+                    <p>بر اساس دروس گذرانده، پیشنهاد می‌شود دروس زیر را از این ترم اخذ کنید:</p>
+                    <div id="term-suggestion-grid" class="course-grid"></div>
+                </div>
+
+                <hr style="width: 80%; margin: 0 auto; border-color: var(--glass-border);">
+
+                <div class="result-section">
+                    <h2>لیست تمام دروس قابل اخذ</h2>
+                     <p>شما می‌توانید از لیست زیر نیز با رعایت سقف واحد، دروس دلخواه را انتخاب کنید.</p>
+                    <div id="all-takable-courses-grid" class="course-grid"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© هکتوریا | تمامی حقوق محفوظ است.</p>
+
+    </footer>
+
+    <script>
+    // --- DATABASE OF COURSES ---
+    // Extracted from the provided PDF
+    const courseData = [
+        // پایه
+        { id: 1, name: 'ریاضی عمومی ۱', credits: 3, practical: 0, prerequisites: [], term: 1, type: 'پایه' },
+        { id: 2, name: 'ریاضی عمومی ۲', credits: 3, practical: 0, prerequisites: [1], term: 2, type: 'پایه' },
+        { id: 3, name: 'معادلات دیفرانسیل', credits: 3, practical: 0, prerequisites: [2], term: 3, type: 'پایه' },
+        { id: 4, name: 'آمار و احتمال مهندسی', credits: 3, practical: 0, prerequisites: [1], term: 3, type: 'پایه' },
+        { id: 5, name: 'فیزیک ۱', credits: 3, practical: 0, prerequisites: [1], term: 2, type: 'پایه' },
+        { id: 6, name: 'فیزیک ۲', credits: 3, practical: 0, prerequisites: [5], term: 3, type: 'پایه' },
+        { id: 7, name: 'آزمایشگاه فیزیک ۲', credits: 0, practical: 1, corequisites: [6], term: 4, type: 'پایه' },
+        { id: 8, name: 'کارگاه عمومی', credits: 0, practical: 1, prerequisites: [], term: 2, type: 'پایه' },
+        
+        // تخصصی اصلی
+        { id: 9, name: 'مبانی کامپیوتر و برنامه سازی', credits: 3, practical: 0, prerequisites: [], term: 1, type: 'اصلی' },
+        { id: 10, name: 'کارگاه کامپیوتر', credits: 0, practical: 1, corequisites: [9], term: 1, type: 'اصلی' },
+        { id: 11, name: 'ریاضیات گسسته', credits: 3, practical: 0, prerequisites: [], term: 2, type: 'اصلی' },
+        { id: 12, name: 'مدارهای منطقی', credits: 3, practical: 0, prerequisites: [11], term: 2, type: 'اصلی' },
+        { id: 13, name: 'آزمایشگاه مدارهای منطقی', credits: 0, practical: 1, corequisites: [12], term: 3, type: 'اصلی' },
+        { id: 14, name: 'برنامه سازی پیشرفته', credits: 3, practical: 0, prerequisites: [9], term: 2, type: 'اصلی' },
+        { id: 15, name: 'زبان تخصصی کامپیوتر', credits: 2, practical: 0, prerequisites: [], term: 6, type: 'اصلی' },
+        { id: 16, name: 'مدارهای الکتریکی و الکترونیکی', credits: 3, practical: 0, prerequisites: [6, 3], term: 4, type: 'اصلی' },
+        { id: 17, name: 'آزمایشگاه مدارهای الکتریکی و الکترونیکی', credits: 0, practical: 1, corequisites: [16], term: 8, type: 'اختیاری' }, // Moved to optional for display
+        { id: 18, name: 'داده ساختارها و الگوریتم ها', credits: 3, practical: 0, prerequisites: [14, 11], term: 3, type: 'اصلی' },
+        { id: 19, name: 'معماری کامپیوتر', credits: 3, practical: 0, prerequisites: [12], term: 3, type: 'اصلی' },
+        { id: 20, name: 'آزمایشگاه معماری کامپیوتر', credits: 0, practical: 1, corequisites: [19], term: 4, type: 'اصلی' },
+        { id: 21, name: 'طراحی سیستم های دیجیتال', credits: 3, practical: 0, prerequisites: [19], term: 6, type: 'اصلی' },
+        { id: 22, name: 'نظریه زبان ها و ماشین ها', credits: 3, practical: 0, prerequisites: [18], term: 5, type: 'اصلی' },
+        { id: 23, name: 'جبر خطی', credits: 3, practical: 0, prerequisites: [2], term: 4, type: 'اصلی' },
+        { id: 24, name: 'هوش مصنوعی', credits: 3, practical: 0, prerequisites: [18, 4], term: 5, type: 'اصلی' },
+        { id: 25, name: 'سیستم های نهفته و بی درنگ', credits: 3, practical: 0, prerequisites: [19], term: 5, type: 'اصلی' },
+        { id: 26, name: 'سیستم های عامل', credits: 3, practical: 0, prerequisites: [18, 19], term: 4, type: 'اصلی' },
+        { id: 27, name: 'آزمایشگاه سیستم های عامل', credits: 0, practical: 1, corequisites: [26], term: 5, type: 'اصلی' },
+        { id: 28, name: 'روش پژوهش و ارائه', credits: 2, practical: 0, prerequisites: [15], term: 7, type: 'اصلی' },
+        { id: 29, name: 'تحلیل و طراحی نرم افزار', credits: 3, practical: 0, prerequisites: [18], term: 5, type: 'اصلی' },
+        { id: 30, name: 'شبکه های کامپیوتری', credits: 3, practical: 0, prerequisites: [26], term: 5, type: 'اصلی' },
+        { id: 31, name: 'آزمایشگاه شبکه های کامپیوتری', credits: 0, practical: 1, corequisites: [30], term: 6, type: 'اصلی' },
+        { id: 32, name: 'امنیت سیستم های کامپیوتری', credits: 3, practical: 0, prerequisites: [30], term: 6, type: 'اصلی' },
+        
+        // تخصصی انتخابی (اختیاری)
+        { id: 33, name: 'طراحی الگوریتم ها', credits: 3, practical: 0, prerequisites: [18], term: 4, type: 'اختیاری' },
+        { id: 34, name: 'طراحی پایگاه داده ها', credits: 3, practical: 0, prerequisites: [18], term: 6, type: 'اختیاری' },
+        { id: 35, name: 'طراحی زبانهای برنامه سازی', credits: 3, practical: 0, prerequisites: [14, 29], term: 7, type: 'اختیاری' },
+        { id: 36, name: 'مهندسی نرم افزار', credits: 3, practical: 0, prerequisites: [18, 4], term: 6, type: 'اختیاری' },
+        { id: 37, name: 'داده کاوی', credits: 3, practical: 0, prerequisites: [22], term: 7, type: 'اختیاری' },
+        { id: 38, name: 'طراحی کامپایلر', credits: 3, practical: 0, prerequisites: [19], term: 6, type: 'اختیاری' },
+        { id: 39, name: 'شبیه سازی کامپیوتری', credits: 3, practical: 0, prerequisites: [4], term: 7, type: 'اختیاری' },
+
+        // دروس پیشنهادی اختیاری دیگر
+        { id: 40, name: 'مبانی هوش محاسباتی', credits: 3, practical: 0, prerequisites: [23, 24], term: 7, type: 'اختیاری' },
+        { id: 41, name: 'مفاهیم پیشرفته کامپیوتر', credits: 3, practical: 0, prerequisites: [18], term: 8, type: 'اختیاری' },
+        { id: 42, name: 'برنامه نویسی وب', credits: 2, practical: 1, prerequisites: [34], term: 0, type: 'اختیاری' }, // ترم نامشخص
+        { id: 43, name: 'آزمایشگاه سخت افزار', credits: 0, practical: 1, prerequisites: [20], term: 7, type: 'اختیاری' },
+        { id: 44, name: 'آزمایشگاه مهندسی نرم افزار', credits: 0, practical: 1, prerequisites: [36], term: 8, type: 'اختیاری' },
+        
+        // مهارتی و اشتغال
+        { id: 45, name: 'آشنایی با صنعت کامپیوتر', credits: 1, practical: 0, prerequisites: [], term: 1, type: 'مهارتی' },
+        { id: 46, name: 'مهارت نرم شغلی', credits: 2, practical: 0, prerequisites: [14, 28], term: 4, type: 'مهارتی' },
+        { id: 47, name: 'کارآموزی', credits: 2, practical: 0, prerequisites: [], term: 8, type: 'مهارتی' }, // 100 واحد
+        
+        // پروژه
+        { id: 48, name: 'پروژه نرم افزار', credits: 3, practical: 0, prerequisites: [], term: 8, type: 'پروژه' }, // 100 واحد
+        
+        // عمومی
+        { id: 101, name: 'اندیشه اسلامی (۱)', credits: 2, practical: 0, prerequisites: [], term: 0, type: 'عمومی' },
+        { id: 102, name: 'اندیشه اسلامی (۲)', credits: 2, practical: 0, prerequisites: [101], term: 0, type: 'عمومی' },
+        { id: 103, name: 'اخلاق اسلامی', credits: 2, practical: 0, prerequisites: [], term: 0, type: 'عمومی' },
+        { id: 104, name: 'تاریخ تحلیل صدر اسلام', credits: 2, practical: 0, prerequisites: [], term: 0, type: 'عمومی' },
+        { id: 105, name: 'زبان خارجه ترکیبی ۱', credits: 4, practical: 0, prerequisites: [], term: 2, type: 'عمومی' },
+        { id: 106, name: 'زبان خارجه ترکیبی ۲', credits: 3, practical: 0, prerequisites: [105], term: 3, type: 'عمومی' },
+        { id: 107, name: 'زبان خارجه ترکیبی ۳', credits: 1, practical: 0, prerequisites: [106], term: 4, type: 'عمومی' },
+        { id: 108, name: 'انقلاب اسلامی و ریشه های آن', credits: 2, practical: 0, prerequisites: [], term: 0, type: 'عمومی' },
+        { id: 109, name: 'زبان فارسی', credits: 3, practical: 0, prerequisites: [], term: 0, type: 'عمومی' },
+        { id: 110, name: 'تربیت بدنی', credits: 1, practical: 0, prerequisites: [], term: 0, type: 'عمومی' },
+        { id: 111, name: 'ورزش (۱)', credits: 1, practical: 0, prerequisites: [110], term: 0, type: 'عمومی' },
+        { id: 112, name: 'دانش خانواده و جمعیت', credits: 2, practical: 0, prerequisites: [], term: 0, type: 'عمومی' },
+        { id: 113, name: 'آشنایی با دفاع مقدس', credits: 2, practical: 0, prerequisites: [], term: 8, type: 'عمومی-اختیاری' },
+    ];
+
+
+    // --- APPLICATION STATE ---
+    const appState = {
+        currentPage: 'page-name',
+        userName: '',
+        userGPA: 0,
+        creditLimit: 0,
+        passedCourses: [],
+        pageHistory: []
+    };
+
+    // --- DOM ELEMENTS ---
+    const pages = document.querySelectorAll('.page');
+    const backButton = document.getElementById('back-button');
+    const gpaPrompt = document.getElementById('gpa-prompt');
+
+    // --- LOGIC & FUNCTIONS ---
+
+    function navigateTo(pageId) {
+        if (appState.currentPage !== pageId) {
+            appState.pageHistory.push(appState.currentPage);
+        }
+        appState.currentPage = pageId;
+        
+        pages.forEach(page => page.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        
+        backButton.style.visibility = appState.pageHistory.length > 0 ? 'visible' : 'hidden';
+    }
+
+    function goBack() {
+        if (appState.pageHistory.length > 0) {
+            const previousPage = appState.pageHistory.pop();
+            appState.currentPage = previousPage;
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(previousPage).classList.add('active');
+            backButton.style.visibility = appState.pageHistory.length > 0 ? 'visible' : 'hidden';
+        }
+    }
+
+    function calculateCreditLimit(gpa) {
+        if (gpa > 17) return 24;
+        if (gpa >= 12) return 20;
+        return 14;
+    }
+
+    function populateCourseSelectionList() {
+        const listContainer = document.getElementById('course-list');
+        listContainer.innerHTML = '';
+        courseData.forEach(course => {
+            const totalCredits = course.credits + course.practical;
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            item.innerHTML = `
+                <input type="checkbox" id="course-${course.id}" value="${course.id}">
+                <label for="course-${course.id}">${course.name} (${totalCredits} واحد)</label>
+            `;
+            listContainer.appendChild(item);
+        });
+    }
+    
+    function arePrerequisitesMet(course, passedCourseIds) {
+        if (!course.prerequisites || course.prerequisites.length === 0) {
+            return true;
+        }
+        return course.prerequisites.every(prereqId => passedCourseIds.includes(prereqId));
+    }
+    
+    function getPassedCourseIdsFromCheckboxes() {
+        const checkboxes = document.querySelectorAll('#course-list input[type="checkbox"]:checked');
+        return Array.from(checkboxes).map(cb => parseInt(cb.value));
+    }
+    
+    function determineCurrentTerm(passedCourseIds) {
+        let maxTermPassed = 0;
+        for (let term = 1; term <= 8; term++) {
+            const termCourses = courseData.filter(c => c.term === term && c.type !== 'عمومی');
+            if(termCourses.length === 0) continue;
+            
+            const passedTermCourses = termCourses.filter(c => passedCourseIds.includes(c.id));
+            if (passedTermCourses.length / termCourses.length > 0.5) {
+                 maxTermPassed = term;
+            }
+        }
+        return Math.min(maxTermPassed + 1, 8);
+    }
+    
+    function createCourseCard(course, isTakable = true) {
+        const totalCredits = course.credits + course.practical;
+        const card = document.createElement('div');
+        card.className = `suggested-course-card ${isTakable ? '' : 'not-takable'}`;
+        card.innerHTML = `
+            <div class="course-name">${course.name}</div>
+            <div class="course-credits">${totalCredits} واحد (${course.type})</div>
+        `;
+        return card;
+    }
+
+    function processAndDisplayResults() {
+        appState.passedCourses = getPassedCourseIdsFromCheckboxes();
+        
+        const takableCourses = courseData.filter(course => 
+            !appState.passedCourses.includes(course.id) && arePrerequisitesMet(course, appState.passedCourses)
+        );
+        
+        // --- Display User Info ---
+        document.getElementById('user-info').innerHTML = `
+            <p><strong>${appState.userName} عزیز</strong>، وضعیت شما به شرح زیر است:</p>
+            <p>معدل: ${appState.userGPA} | سقف واحد مجاز: ${appState.creditLimit} واحد</p>
+        `;
+
+        // --- Suggest Term Courses ---
+        const currentTerm = determineCurrentTerm(appState.passedCourses);
+        document.getElementById('suggested-term').innerText = currentTerm;
+        
+        const termCourses = courseData.filter(c => c.term === currentTerm);
+        const termGrid = document.getElementById('term-suggestion-grid');
+        termGrid.innerHTML = '';
+        if (termCourses.length > 0) {
+            termCourses.forEach(course => {
+                if (!appState.passedCourses.includes(course.id)) {
+                    const isTakable = arePrerequisitesMet(course, appState.passedCourses);
+                    termGrid.appendChild(createCourseCard(course, isTakable));
+                }
+            });
+        } else {
+             termGrid.innerHTML = '<p>درسی برای این ترم در چارت تعریف نشده است.</p>';
+        }
+
+        // --- Display all takable courses ---
+        const allTakableGrid = document.getElementById('all-takable-courses-grid');
+        allTakableGrid.innerHTML = '';
+        if (takableCourses.length > 0) {
+            takableCourses.forEach(course => {
+                allTakableGrid.appendChild(createCourseCard(course, true));
+            });
+        } else {
+            allTakableGrid.innerHTML = '<p>در حال حاضر درس قابل اخذی برای شما وجود ندارد.</p>';
+        }
+
+        navigateTo('page-results');
+    }
+
+    // --- EVENT LISTENERS ---
+
+    document.getElementById('form-name').addEventListener('submit', (e) => {
+        e.preventDefault();
+        appState.userName = document.getElementById('user-name').value;
+        gpaPrompt.textContent = `${appState.userName}، خوش آمدی!`;
+        navigateTo('page-gpa');
+    });
+
+    document.getElementById('form-gpa').addEventListener('submit', (e) => {
+        e.preventDefault();
+        appState.userGPA = parseFloat(document.getElementById('user-gpa').value);
+        if (isNaN(appState.userGPA) || appState.userGPA < 0 || appState.userGPA > 20) {
+            alert('لطفاً معدل معتبری بین ۰ تا ۲۰ وارد کنید.');
+            return;
+        }
+        appState.creditLimit = calculateCreditLimit(appState.userGPA);
+        populateCourseSelectionList();
+        navigateTo('page-courses');
+    });
+    
+    document.getElementById('confirm-courses-btn').addEventListener('click', processAndDisplayResults);
+    
+    backButton.addEventListener('click', goBack);
+
+    </script>
+</body>
+</html>

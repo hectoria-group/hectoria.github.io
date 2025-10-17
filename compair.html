@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>مقایسه‌گر دو متن — هکتوریا</title>
+
+  <!-- فونت وزیر -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css">
+
+  <style>
+    :root{
+      --bg-dark:#0b0d10; /* مشکی مات */
+      --panel: rgba(255,255,255,0.02);
+      --glass-border: rgba(255,255,255,0.04);
+      --text:#e6eef8;
+      --muted:#9aa4b2;
+      --neon1:#6ee7ff; /* آبی یخی */
+      --neon2:#b388ff; /* بنفش */
+      --green:#9ef6c7; /* سبز روشن */
+      --red:#ff8b8b; /* قرمز روشن */
+      --yellow:#f9d86a; /* زرد موزی */
+      --orange:#ff7a3d; /* پرتغالی */
+      --radius:14px;
+      --shadow: 0 10px 40px rgba(2,6,23,0.6);
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      background:
+        radial-gradient(600px 300px at 10% 10%, rgba(255,255,255,0.02), transparent 8%),
+        radial-gradient(500px 300px at 90% 80%, rgba(255,255,255,0.01), transparent 8%),
+        var(--bg-dark);
+      color:var(--text);
+      font-family:"Vazir", "Vazir Web", sans-serif;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-y:auto;
+    }
+
+    /* پس‌زمینهٔ المان‌های بلوری */
+    .bg-ornaments{ position:fixed; inset:0; pointer-events:none; z-index:0; }
+    .orb{
+      position:absolute; border-radius:50%; filter: blur(36px) saturate(1.1);
+      opacity:0.22; mix-blend-mode:screen; animation: drift 20s ease-in-out infinite;
+    }
+    .orb.o1{ width:420px;height:420px; background: radial-gradient(circle at 30% 30%, #9ef6ff, #2fb7ff); left:6%; top:8%; animation-duration:22s; }
+    .orb.o2{ width:360px;height:260px; background: radial-gradient(circle at 40% 40%, #caffb3, #5de9a9); right:10%; top:18%; animation-duration:26s;}
+    .orb.o3{ width:300px;height:480px; background: radial-gradient(circle at 50% 40%, #f9c56a, #ff7a3d); left:18%; bottom:6%; animation-duration:24s; opacity:0.16;}
+    .orb.o4{ width:240px;height:240px; background: radial-gradient(circle at 40% 60%, #d1b3ff, #9b6bff); right:18%; bottom:12%; animation-duration:20s; opacity:0.18;}
+    @keyframes drift{
+      0%{ transform: translateY(0) rotate(0deg); }
+      50%{ transform: translateY(-18px) rotate(5deg); }
+      100%{ transform: translateY(0) rotate(0deg); }
+    }
+
+    .mist{ position:fixed; inset:0; background: linear-gradient(180deg, rgba(255,255,255,0.006), rgba(255,255,255,0.002)); pointer-events:none; z-index:0; }
+
+    /* لایهٔ مرکزی */
+    .container{
+      max-width:1200px; margin:36px auto; padding:22px; position:relative; z-index:2;
+    }
+
+    /* ناوبار */
+    .navbar{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid var(--glass-border); padding:12px 16px; border-radius:12px; box-shadow:var(--shadow);
+      backdrop-filter: blur(8px) saturate(120%);
+    }
+    .brand{ display:flex; gap:12px; align-items:center; }
+    .logo{ width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(135deg,var(--neon1),var(--neon2)); color:#021; font-weight:800; font-size:18px; box-shadow:0 8px 30px rgba(110,231,255,0.06);
+    }
+    .nav-links{ display:flex; gap:12px; align-items:center; direction:rtl; }
+    .nav-links a{ color:var(--muted); text-decoration:none; padding:8px 10px; border-radius:10px; font-weight:700; transition:all .16s ease; }
+    .nav-links a:hover{ color:var(--text); background: rgba(255,255,255,0.02); box-shadow: 0 8px 30px rgba(110,231,255,0.03); transform:translateY(-2px); }
+
+    /* کارت گلس */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid var(--glass-border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow);
+      backdrop-filter: blur(8px) saturate(120%);
+    }
+
+    /* فضای اصلی مقایسه */
+    .compare-area{ display:grid; grid-template-columns: 1fr 360px 1fr; gap:14px; align-items:start; margin-top:12px; }
+    .panel{ display:flex; flex-direction:column; gap:10px; min-height:380px; }
+    .panel header{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .panel header h3{ margin:0; font-size:15px; }
+
+    textarea{
+      min-height:320px; resize:vertical; padding:12px; border-radius:10px; font-family:"Vazir", monospace; font-size:13px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+      border:1px solid rgba(255,255,255,0.03); color:var(--text); outline:none;
+    }
+
+    .controls{ display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:flex-start; }
+    .btn{
+      padding:10px 14px; border-radius:12px; border:none; cursor:pointer; font-weight:800; background: linear-gradient(180deg,var(--neon1),var(--neon2));
+      color:#021; box-shadow: 0 10px 30px rgba(110,231,255,0.07); transition:transform .12s ease;
+    }
+    .btn.secondary{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.04); }
+    .btn:active{ transform:translateY(2px); }
+
+    .swap-btn{ width:56px;height:56px;border-radius:14px; display:grid; place-items:center; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); border:1px solid rgba(255,255,255,0.03); cursor:pointer; }
+
+    .options{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .options label{ font-size:13px; color:var(--muted); display:inline-flex; gap:6px; align-items:center; }
+
+    /* نمایش نتیجه */
+    .result{
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .result-view{ display:flex; gap:8px; border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.03); }
+    .col{ flex:1; min-width:0; }
+    .col pre{ margin:0; padding:12px; min-height:220px; overflow:auto; font-family:"Vazir", monospace; font-size:13px; line-height:1.5; white-space:pre-wrap; word-break:break-word; }
+
+    /* هایلایت */
+    .line{ padding:6px 10px; border-bottom:1px solid rgba(255,255,255,0.02); }
+    .same{ background:transparent; color:var(--text); }
+    .added{ background: linear-gradient(90deg, rgba(158,246,199,0.06), rgba(158,246,199,0.02)); border-left:4px solid rgba(158,246,199,0.9); color:var(--text); }
+    .removed{ background: linear-gradient(90deg, rgba(255,139,139,0.06), rgba(255,139,139,0.02)); border-left:4px solid rgba(255,139,139,0.9); color:var(--text); }
+    .changed{ background: linear-gradient(90deg, rgba(249,216,106,0.04), rgba(249,216,106,0.01)); border-left:4px solid rgba(249,216,106,0.9); color:var(--text); }
+
+    .word-added{ background: rgba(158,246,199,0.25); padding:0 4px; border-radius:4px; }
+    .word-removed{ background: rgba(255,139,139,0.22); padding:0 4px; border-radius:4px; text-decoration:line-through; opacity:0.9; }
+
+    /* هم‌زمان سازی اسکرول */
+    .sync-scroll{ height:320px; overflow:auto; }
+
+    /* footer */
+    footer{ margin-top:20px; }
+    .footer-line{ height:6px; border-radius:6px; margin-bottom:12px; background: linear-gradient(90deg, rgba(110,231,255,0.95), rgba(179,136,255,0.95)); box-shadow:0 0 30px rgba(110,231,255,0.12); animation: glow 3s linear infinite; border:1px solid rgba(255,255,255,0.03); }
+    @keyframes glow{ 0%{ transform:translateX(0); } 50%{ transform:translateX(6%);} 100%{ transform:translateX(0); } }
+    .footer-main{ display:flex; justify-content:space-between; gap:12px; padding:12px; border-radius:10px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); border:1px solid rgba(255,255,255,0.02); }
+
+    /* responsive */
+    @media (max-width:1100px){
+      .compare-area{ grid-template-columns: 1fr 280px 1fr; gap:10px; }
+    }
+    @media (max-width:860px){
+      .nav-links{ display:none; }
+      .compare-area{ grid-template-columns: 1fr; }
+      .controls{ flex-direction:row; justify-content:space-between; align-items:center; }
+      .result-view{ flex-direction:column; }
+      .sync-scroll{ height:220px; }
+      textarea{ min-height:180px; }
+    }
+    @media (max-width:420px){
+      .logo{ width:40px;height:40px;font-size:16px; }
+      .sync-scroll{ height:180px; }
+    }
+
+    .muted{ color:var(--muted); font-size:13px; }
+    .small{ font-size:12px; color:var(--muted); }
+
+  </style>
+</head>
+<body>
+  <div class="bg-ornaments" aria-hidden="true">
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="orb o3"></div>
+    <div class="orb o4"></div>
+  </div>
+  <div class="mist" aria-hidden="true"></div>
+
+  <div class="container">
+    <!-- navbar -->
+    <nav class="navbar card" role="navigation" aria-label="ناوبری اصلی">
+      <div class="brand">
+        <div class="logo">هـ</div>
+        <div>
+          <div style="font-weight:800;font-size:16px">هکتوریا</div>
+          <div class="small muted">مقایسه‌گر متن و کد</div>
+        </div>
+      </div>
+
+      <div class="nav-links" role="menu" aria-label="منو">
+        <a href="index.html">خانه</a>
+      </div>
+    </nav>
+
+    <!-- main -->
+    <main class="card" role="main" aria-labelledby="title">
+      <h2 id="title" style="margin:0 0 12px 0">مقایسه‌گر دو متن / کد — اختلاف‌ها را پیدا کن</h2>
+
+      <div class="compare-area" role="region" aria-label="فضای مقایسه">
+        <!-- چپ -->
+        <section class="panel">
+          <header>
+            <h3>متن اول / مبدأ</h3>
+            <div class="small muted">متن یا کد را اینجا وارد کنید</div>
+          </header>
+          <textarea id="leftText" placeholder="متن اول..."></textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="small muted">نمونه‌ها:</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn secondary" id="sample1">نمونه کوچک</button>
+              <button class="btn secondary" id="sampleCode">نمونه کد</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- کنترل‌ها -->
+        <aside class="card controls" style="align-items:center">
+          <button id="compareBtn" class="btn" title="مقایسه">مقایسه</button>
+          <button id="swapBtn" class="swap-btn" title="معاوضه">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l-4 4 4 4" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M17 17l4-4-4-4" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button id="clearBtn" class="btn secondary" title="پاک کردن">پاک کردن</button>
+
+          <div style="width:100%;margin-top:6px">
+            <div class="options">
+              <label><input type="checkbox" id="ignoreWS"> نادیده گرفتن فاصله‌ها</label>
+              <label><input type="checkbox" id="ignoreCase"> نادیده گرفتن حروف بزرگ/کوچک</label>
+            </div>
+            <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+              <button id="copyBtn" class="btn secondary">کپی نتیجه</button>
+              <button id="downloadBtn" class="btn secondary">دانلود نتیجه</button>
+            </div>
+            <div style="margin-top:8px" class="small muted">میانبر: Ctrl / Cmd + Enter برای اجرا</div>
+            <div style="margin-top:8px" class="small muted">نمایش: خط‌به‌خط + برجسته‌سازی سطح‌کلمه‌ای</div>
+          </div>
+        </aside>
+
+        <!-- راست -->
+        <section class="panel">
+          <header>
+            <h3>متن دوم / مقصد</h3>
+            <div class="small muted">متن یا کد را اینجا وارد کنید</div>
+          </header>
+          <textarea id="rightText" placeholder="متن دوم..."></textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="small muted">نمایش نتیجه:</div>
+            <div style="display:flex;gap:8px">
+              <button id="sideBySideBtn" class="btn secondary">کنار هم</button>
+              <button id="unifiedBtn" class="btn secondary">یکپارچه</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- نتیجه -->
+      <section class="card result" style="margin-top:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:800">نتیجهٔ مقایسه</div>
+          <div class="muted" id="status">آماده</div>
+        </div>
+
+        <div id="resultContainer" class="result-view" role="region" aria-label="نتیجه مقایسه">
+          <!-- ستون‌ها به‌صورت داینامیک پر می‌شوند -->
+          <div class="col sync-scroll" id="leftCol" aria-label="متن اول (نتیجه)"><pre id="leftResult" aria-live="polite"></pre></div>
+          <div class="col sync-scroll" id="rightCol" aria-label="متن دوم (نتیجه)"><pre id="rightResult" aria-live="polite"></pre></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- footer -->
+    <footer>
+      <div class="footer-line" aria-hidden="true"></div>
+      <div class="footer-main">
+        <div>© هکتوریا | تمامی حقوق محفوظ است.</div>
+
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // المان‌ها
+    const leftText = document.getElementById('leftText');
+    const rightText = document.getElementById('rightText');
+    const compareBtn = document.getElementById('compareBtn');
+    const swapBtn = document.getElementById('swapBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const status = document.getElementById('status');
+    const ignoreWS = document.getElementById('ignoreWS');
+    const ignoreCase = document.getElementById('ignoreCase');
+    const leftResult = document.getElementById('leftResult');
+    const rightResult = document.getElementById('rightResult');
+    const leftCol = document.getElementById('leftCol');
+    const rightCol = document.getElementById('rightCol');
+    const sample1 = document.getElementById('sample1');
+    const sampleCode = document.getElementById('sampleCode');
+    const sideBySideBtn = document.getElementById('sideBySideBtn');
+    const unifiedBtn = document.getElementById('unifiedBtn');
+
+    // حالت نمایش: side (کنار هم) یا unified (یکپارچه)
+    let viewMode = 'side';
+
+    sideBySideBtn.addEventListener('click', ()=>{ viewMode='side'; sideBySideBtn.classList.add('active'); unifiedBtn.classList.remove('active'); renderLast(); });
+    unifiedBtn.addEventListener('click', ()=>{ viewMode='unified'; unifiedBtn.classList.add('active'); sideBySideBtn.classList.remove('active'); renderLast(); });
+
+    // نمونه‌ها
+    sample1.addEventListener('click', ()=>{
+      leftText.value = `سلام دنیا
+این یک متن نمونه است.
+خط سوم با چند کلمه.
+پایان.`;
+
+      rightText.value = `سلام دنیا
+این یک متن نمونه است
+خط سوم با چند کلمهٔ اضافه شده.
+پایان.`;
+    });
+
+    sampleCode.addEventListener('click', ()=>{
+      leftText.value = `function greet(name) {
+  console.log('سلام ' + name);
+}
+
+const nums = [1,2,3];
+nums.forEach(n => console.log(n));`;
+
+      rightText.value = `def greet(name):
+    print('سلام ' + name)
+
+nums = [1,2,3]
+for n in nums:
+    print(n)`;
+    });
+
+    // همگام‌سازی اسکرول بین دو ستون
+    function syncScroll(a,b){
+      let isSyncingA = false;
+      let isSyncingB = false;
+      a.addEventListener('scroll', ()=>{
+        if(isSyncingA) { isSyncingA = false; return; }
+        isSyncingB = true;
+        b.scrollTop = a.scrollTop;
+      });
+      b.addEventListener('scroll', ()=>{
+        if(isSyncingB) { isSyncingB = false; return; }
+        isSyncingA = true;
+        a.scrollTop = b.scrollTop;
+      });
+    }
+    syncScroll(leftCol, rightCol);
+
+    // الگوریتم LCS برای پیدا کردن سکوئنس مشترک (برای خطوط یا کلمات)
+    function lcsMatrix(a, b) {
+      const n = a.length, m = b.length;
+      const dp = Array.from({length: n+1}, ()=> new Array(m+1).fill(0));
+      for(let i=n-1;i>=0;i--){
+        for(let j=m-1;j>=0;j--){
+          if(a[i] === b[j]) dp[i][j] = dp[i+1][j+1] + 1;
+          else dp[i][j] = Math.max(dp[i+1][j], dp[i][j+1]);
+        }
+      }
+      return dp;
+    }
+
+    function backtrackLCS(dp, a, b) {
+      const resA = [], resB = [];
+      let i=0,j=0;
+      while(i<a.length && j<b.length){
+        if(a[i] === b[j]){
+          resA.push({type:'same', text:a[i]});
+          resB.push({type:'same', text:b[j]});
+          i++; j++;
+        } else if (dp[i+1][j] >= dp[i][j+1]) {
+          resA.push({type:'removed', text:a[i]});
+          i++;
+        } else {
+          resB.push({type:'added', text:b[j]});
+          j++;
+        }
+      }
+      while(i<a.length){ resA.push({type:'removed', text:a[i]}); i++; }
+      while(j<b.length){ resB.push({type:'added', text:b[j]}); j++; }
+      return {left: resA, right: resB};
+    }
+
+    // diff خطوط: باز می‌گرداند آرایهٔ آیتم‌های توصیفی
+    function diffLines(left, right) {
+      const a = left.slice();
+      const b = right.slice();
+      const dp = lcsMatrix(a,b);
+      const res = backtrackLCS(dp,a,b);
+      // ردیف‌بندی: تبدیل هرکدام به یک آرایه همگن با نوع
+      // هماهنگ‌سازی طول دو ستون برای نمایش side-by-side
+      const out = [];
+      // indices
+      let li = 0, ri = 0;
+      while(li < res.left.length || ri < res.right.length){
+        const la = res.left[li];
+        const rb = res.right[ri];
+        if(la && la.type === 'same' && rb && rb.type === 'same'){
+          out.push({type:'same', left:la.text, right:rb.text});
+          li++; ri++;
+        } else if (la && la.type === 'removed'){
+          out.push({type:'removed', left:la.text, right:''});
+          li++;
+        } else if (rb && rb.type === 'added'){
+          out.push({type:'added', left:'', right:rb.text});
+          ri++;
+        } else {
+          // حالت پیش‌بینی نشده: ایمن‌سازی
+          if(la){ out.push({type:la.type,left:la.text,right:''}); li++; }
+          else if(rb){ out.push({type:rb.type,left:'',right:rb.text}); ri++; }
+          else break;
+        }
+      }
+      return out;
+    }
+
+    // diff سطح-کلمه‌ای: برای خطوطی که در هر دو وجود دارند ولی متفاوتند
+    function diffWords(aLine, bLine) {
+      const aWords = aLine.split(/(\s+)/); // نگه داشتن فاصله‌ها به عنوان توکن
+      const bWords = bLine.split(/(\s+)/);
+      const dp = lcsMatrix(aWords, bWords);
+      // بازگشت از dp اما با ساختار کلمات
+      const resLeft = [], resRight = [];
+      let i=0,j=0;
+      while(i < aWords.length && j < bWords.length){
+        if(aWords[i] === bWords[j]){
+          resLeft.push({type:'same', text:aWords[i]});
+          resRight.push({type:'same', text:bWords[j]});
+          i++; j++;
+        } else if (dp[i+1][j] >= dp[i][j+1]){
+          resLeft.push({type:'removed', text:aWords[i]});
+          i++;
+        } else {
+          resRight.push({type:'added', text:bWords[j]});
+          j++;
+        }
+      }
+      while(i < aWords.length){ resLeft.push({type:'removed', text:aWords[i]}); i++; }
+      while(j < bWords.length){ resRight.push({type:'added', text:bWords[j]}); j++; }
+
+      // ساخت رشته‌های HTML با کلاس‌های مناسب
+      const leftHtml = resLeft.map(tok => {
+        if(tok.type === 'same') return escapeHtml(tok.text);
+        if(tok.type === 'removed') return `<span class="word-removed">${escapeHtml(tok.text)}</span>`;
+        return escapeHtml(tok.text);
+      }).join('');
+      const rightHtml = resRight.map(tok => {
+        if(tok.type === 'same') return escapeHtml(tok.text);
+        if(tok.type === 'added') return `<span class="word-added">${escapeHtml(tok.text)}</span>`;
+        return escapeHtml(tok.text);
+      }).join('');
+      return {leftHtml, rightHtml};
+    }
+
+    // فرار از HTML در متن
+    function escapeHtml(s){
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // تابع اصلی برای مقایسه و تولید نمایش
+    let lastResult = null;
+    function compareAndRender(){
+      const rawLeft = leftText.value.split(/\r?\n/);
+      const rawRight = rightText.value.split(/\r?\n/);
+      const optLeft = rawLeft.slice();
+      const optRight = rawRight.slice();
+
+      // اعمال گزینه‌ها
+      if(ignoreWS.checked){
+        for(let i=0;i<optLeft.length;i++) optLeft[i] = optLeft[i].replace(/\s+/g,' ').trim();
+        for(let i=0;i<optRight.length;i++) optRight[i] = optRight[i].replace(/\s+/g,' ').trim();
+      }
+      if(ignoreCase.checked){
+        for(let i=0;i<optLeft.length;i++) optLeft[i] = optLeft[i].toLowerCase();
+        for(let i=0;i<optRight.length;i++) optRight[i] = optRight[i].toLowerCase();
+      }
+
+      const diffs = diffLines(optLeft, optRight); // این diffs مربوط به خطوط با توجه به گزینه‌هاست
+
+      // اما برای نمایش بهتر، از متن اصلی (raw) برای هایلایت استفاده می‌کنیم
+      const final = diffs.map((d, idx) => {
+        const origLeft = d.left !== '' ? rawLeft[ rawLeftIndex(d, rawLeft, optLeft) ] : '';
+        const origRight = d.right !== '' ? rawRight[ rawRightIndex(d, rawRight, optRight) ] : '';
+        // اگر هر دو وجود دارند و متفاوتند -> حالت changed با diff word-level
+        if(d.type === 'same') return { type:'same', left: escapeHtml(origLeft), right: escapeHtml(origRight) };
+        if(d.type === 'removed') return { type:'removed', left: escapeHtml(origLeft), right: '' };
+        if(d.type === 'added') return { type:'added', left:'', right: escapeHtml(origRight) };
+
+        return { type:d.type, left: escapeHtml(origLeft), right: escapeHtml(origRight) };
+      });
+
+      // اما روش بالا ممکن است از mapping اشتباه استفاده کند؛ به جای پیچیدگی بیش‌تر، بهتر است از diffLines اصلی با ورودی‌های اصلی اما تطبیق شده استفاده کنیم:
+      const diffs2 = diffLines(rawLeft, rawRight);
+
+      // تولید HTML برای هر سطر، با word-level برای خطوطی که در هر دو متفاوتند
+      let leftHtml = '';
+      let rightHtml = '';
+      diffs2.forEach(item=>{
+        if(item.type === 'same'){
+          leftHtml += `<div class="line same">${escapeHtml(item.left)}</div>`;
+          rightHtml += `<div class="line same">${escapeHtml(item.right)}</div>`;
+        } else if(item.type === 'removed'){
+          leftHtml += `<div class="line removed">${escapeHtml(item.left)}</div>`;
+          rightHtml += `<div class="line"></div>`;
+        } else if(item.type === 'added'){
+          leftHtml += `<div class="line"></div>`;
+          rightHtml += `<div class="line added">${escapeHtml(item.right)}</div>`;
+        } else {
+          // fallback
+          leftHtml += `<div class="line changed">${escapeHtml(item.left||'')}</div>`;
+          rightHtml += `<div class="line changed">${escapeHtml(item.right||'')}</div>`;
+        }
+        // اگر هر دو سطر وجود دارند و هرچند با هم متفاوتند، تلاش می‌کنیم word-level ها را نمایش دهیم
+        if(item.left && item.right && item.left !== item.right){
+          const words = diffWords(item.left, item.right);
+          // اضافه کردن سطرِ تغییر یافته با هایلایت کلمات
+          leftHtml = leftHtml.replace(/<\/div>$/, `<div class="line changed">${words.leftHtml}</div>`);
+          rightHtml = rightHtml.replace(/<\/div>$/, `<div class="line changed">${words.rightHtml}</div>`);
+        }
+      });
+
+      // اگر حالت unified خواستیم، نمایش یک ستون واحد (ترکیبی)
+      if(viewMode === 'unified'){
+        // ترکیب با پیشوند علامت‌ها
+        const unifiedLines = [];
+        diffs2.forEach(item=>{
+          if(item.type === 'same') unifiedLines.push({type:'same', text:item.left});
+          else if(item.type === 'removed') unifiedLines.push({type:'removed', text:item.left});
+          else if(item.type === 'added') unifiedLines.push({type:'added', text:item.right});
+          else unifiedLines.push({type:'changed-left', text:item.left}, {type:'changed-right', text:item.right});
+        });
+        let uniHtml = unifiedLines.map(u=>{
+          if(u.type === 'same') return `<div class="line same">${escapeHtml(u.text)}</div>`;
+          if(u.type === 'removed') return `<div class="line removed">− ${escapeHtml(u.text)}</div>`;
+          if(u.type === 'added') return `<div class="line added">+ ${escapeHtml(u.text)}</div>`;
+          if(u.type === 'changed-left') return `<div class="line changed">− ${escapeHtml(u.text)}</div>`;
+          if(u.type === 'changed-right') return `<div class="line changed">+ ${escapeHtml(u.text)}</div>`;
+          return `<div class="line">${escapeHtml(u.text||'')}</div>`;
+        }).join('');
+        leftResult.innerHTML = uniHtml;
+        rightResult.innerHTML = ''; // hide second column content
+      } else {
+        leftResult.innerHTML = leftHtml;
+        rightResult.innerHTML = rightHtml;
+      }
+
+      status.textContent = `مقایسه انجام شد — ${diffs2.filter(d=>d.type!=='same').length} سطر اختلاف`;
+      lastResult = {leftHtml, rightHtml, diffs: diffs2};
+    }
+
+    // توابع کمکی برای mapping ساده (پیاده‌سازی ایمن)
+    function rawLeftIndex(d, rawLeft, optLeft){
+      // در این پروتوتایپ نمی‌خواهیم mapping پیچیده انجام دهیم؛ بازگردانی اولین تطابق
+      for(let i=0;i<rawLeft.length;i++){
+        if(normalize(rawLeft[i]) === normalize(d.left)) return i;
+      }
+      return 0;
+    }
+    function rawRightIndex(d, rawRight, optRight){
+      for(let i=0;i<rawRight.length;i++){
+        if(normalize(rawRight[i]) === normalize(d.right)) return i;
+      }
+      return 0;
+    }
+    function normalize(s){
+      if(!s) return '';
+      return s.replace(/\s+/g,' ').trim();
+    }
+
+    // escapeHtml برای اطمینان دوباره
+    function escapeHtml(s){ if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // نگهداری آخرین نتیجه برای تغییر حالت نمایش
+    function renderLast(){
+      if(!lastResult) return;
+      if(viewMode === 'unified'){
+        // ساخت یکپارچه از lastResult.diffs
+        const diffs2 = lastResult.diffs;
+        const unifiedLines = [];
+        diffs2.forEach(item=>{
+          if(item.type === 'same') unifiedLines.push({type:'same', text:item.left});
+          else if(item.type === 'removed') unifiedLines.push({type:'removed', text:item.left});
+          else if(item.type === 'added') unifiedLines.push({type:'added', text:item.right});
+          else unifiedLines.push({type:'changed-left', text:item.left}, {type:'changed-right', text:item.right});
+        });
+        let uniHtml = unifiedLines.map(u=>{
+          if(u.type === 'same') return `<div class="line same">${escapeHtml(u.text)}</div>`;
+          if(u.type === 'removed') return `<div class="line removed">− ${escapeHtml(u.text)}</div>`;
+          if(u.type === 'added') return `<div class="line added">+ ${escapeHtml(u.text)}</div>`;
+          if(u.type === 'changed-left') return `<div class="line changed">− ${escapeHtml(u.text)}</div>`;
+          if(u.type === 'changed-right') return `<div class="line changed">+ ${escapeHtml(u.text)}</div>`;
+          return `<div class="line">${escapeHtml(u.text||'')}</div>`;
+        }).join('');
+        leftResult.innerHTML = uniHtml;
+        rightResult.innerHTML = '';
+      } else {
+        leftResult.innerHTML = lastResult.leftHtml;
+        rightResult.innerHTML = lastResult.rightHtml;
+      }
+    }
+
+    // رویدادها
+    compareBtn.addEventListener('click', compareAndRender);
+    swapBtn.addEventListener('click', ()=>{
+      const a = leftText.value; leftText.value = rightText.value; rightText.value = a;
+      status.textContent = 'متن‌ها معاوضه شدند';
+    });
+    clearBtn.addEventListener('click', ()=>{
+      leftText.value = ''; rightText.value = ''; leftResult.innerHTML=''; rightResult.innerHTML=''; status.textContent='پاک شد';
+    });
+
+    copyBtn.addEventListener('click', async ()=>{
+      try{
+        if(viewMode === 'unified'){
+          await navigator.clipboard.writeText(leftResult.innerText);
+        } else {
+          await navigator.clipboard.writeText(leftResult.innerText + '\n\n----\n\n' + rightResult.innerText);
+        }
+        status.textContent = 'نتیجه کپی شد';
+      }catch(e){ status.textContent = 'کپی پشتیبانی نشد'; }
+    });
+
+    downloadBtn.addEventListener('click', ()=>{
+      const blob = new Blob([ (viewMode==='unified'? leftResult.innerText : leftResult.innerText + '\n\n----\n\n' + rightResult.innerText ) ], {type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'diff-result.txt';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      status.textContent = 'دانلود شروع شد';
+    });
+
+    // میانبر Ctrl+Enter
+    document.addEventListener('keydown', (e)=>{
+      if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+        compareAndRender();
+      }
+    });
+
+    // مقدار اولیه وضعیت
+    status.textContent = 'آماده';
+
+    // توجه: پیاده‌سازی LCS و diff در این نسخه ساده و مناسب متن‌ها و کدهای کوچک تا متوسط است.
+    // برای فایل‌های بسیار بزرگ یا حالات پیچیده‌تر (بازآرایی بلوک‌ها، تغییرات چندگانه پیچیده) بهتر است از کتابخانه‌های Diff اختصاصی یا سرور با پردازش AST استفاده کنید.
+  </script>
+</body>
+</html>

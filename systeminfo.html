@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد اطلاعات سیستم</title>
+    <style>
+        /* --- Google Font --- */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Vazirmatn:wght@300;400;700&display=swap');
+
+        /* --- Global Styles & Variables --- */
+        :root {
+            --bg-color: #0d0c1d;
+            --primary-color: #f02d7d;
+            --secondary-color: #3d52d5;
+            --text-color: #e0e0e0;
+            --border-color: rgba(240, 45, 125, 0.3);
+            --font-tech: 'Orbitron', 'Vazirmatn', sans-serif;
+            --font-main: 'Vazirmatn', sans-serif;
+            --glow-color-1: #3d52d5;
+            --glow-color-2: #8a2be2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* =================================
+           بخش جدید: منوی ناوبری (Navbar)
+           ================================= */
+        nav {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            margin-left: 10px;
+        }
+
+        .logo-text {
+            font-family: var(--font-tech);
+            font-size: 20px;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .back-button svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--text-color);
+            transition: fill 0.3s;
+        }
+        
+        .back-button:hover svg {
+            fill: var(--primary-color);
+        }
+        
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-family: var(--font-tech);
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        /* --- Container & Widgets (from previous code) --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: rgba(17, 17, 17, 0.5);
+            border: 2px solid var(--border-color);
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            grid-template-areas:
+                "soundwave soundwave gauge1 gauge2"
+                "bars bars loading loading"
+                "tests tests tests tests";
+        }
+
+        /* [ ... تمام استایل‌های ویجت‌ها که در کد قبلی بود، اینجا قرار می‌گیرند ... ] */
+        .widget { background-color: rgba(0,0,0,0.2); border: 1px solid var(--border-color); padding: 20px; position: relative; }
+        .widget::before, .widget::after { content: ''; position: absolute; width: 10px; height: 10px; border-color: var(--primary-color); border-style: solid; }
+        .widget::before { top: -2px; right: -2px; border-width: 2px 2px 0 0; }
+        .widget::after { bottom: -2px; left: -2px; border-width: 0 0 2px 2px; }
+        .widget-title { font-family: var(--font-tech); color: var(--primary-color); margin-bottom: 15px; font-size: 16px; text-transform: uppercase; }
+        #soundwave-widget { grid-area: soundwave; height: 250px; display: flex; align-items: center; justify-content: center; }
+        .soundwave-container { width: 100%; height: 150px; display: flex; justify-content: space-between; align-items: center; }
+        .soundwave-bar { width: 3px; background-color: var(--primary-color); transition: height 0.1s; }
+        .gauge-widget { grid-area: gauge1; height: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #gauge2 { grid-area: gauge2; }
+        .gauge-circle { width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; background: conic-gradient(var(--secondary-color) 0deg, var(--border-color) 0deg); transition: background 0.5s; }
+        .gauge-circle::before { content: ''; position: absolute; width: 130px; height: 130px; background: #111; border-radius: 50%; }
+        .gauge-inner { z-index: 1; text-align: center; }
+        .gauge-value { font-family: var(--font-tech); font-size: 32px; color: var(--text-color); }
+        .gauge-label { font-size: 14px; color: #aaa; }
+        #bars-widget { grid-area: bars; display: flex; justify-content: space-around; align-items: flex-end; gap: 20px; }
+        .bar-group { flex: 1; text-align: center; }
+        .bar-wrapper { height: 150px; border: 1px solid var(--border-color); display: flex; align-items: flex-end; padding: 5px; margin-bottom: 10px; }
+        .bar { width: 100%; background-color: var(--primary-color); transition: height 0.5s; }
+        .bar-label { font-family: var(--font-tech); font-size: 14px; }
+        .bar-percentage { color: var(--text-color); font-size: 16px; margin-top: 5px; font-family: var(--font-tech); }
+        #loading-widget { grid-area: loading; }
+        .info-item { margin-bottom: 18px; }
+        .info-label { font-family: var(--font-tech); font-size: 14px; margin-bottom: 5px; display: block; }
+        .info-value { background-color: var(--border-color); padding: 5px 8px; color: #111; font-weight: bold; font-size: 14px; display: inline-block; min-width: 100px; text-align: right; }
+        #tests-widget { grid-area: tests; display: flex; flex-wrap: wrap; gap: 15px; }
+        .test-btn { background-color: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); font-family: var(--font-tech); padding: 10px 20px; cursor: pointer; transition: all 0.3s; }
+        .test-btn:hover { background-color: var(--primary-color); color: #111; }
+        .display-test-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; display: none; cursor: pointer; }
+
+        /* ===================================
+           بخش جدید: فوتر (Footer)
+           =================================== */
+        footer {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+            padding-top: 25px;
+            margin-top: 25px;
+            position: relative;
+        }
+
+        .glow-divider {
+            width: 100%;
+            height: 2px;
+            margin-bottom: 20px;
+            position: relative;
+            background: linear-gradient(90deg, transparent, var(--glow-color-1), var(--glow-color-2), transparent);
+            overflow: hidden;
+        }
+        
+        .glow-divider::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--glow-color-1), var(--glow-color-2), transparent);
+            filter: blur(5px);
+            animation: animate-glow-line 4s linear infinite;
+        }
+
+        @keyframes animate-glow-line {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .footer-content p {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .footer-content a {
+            color: #ccc;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        .footer-content a:hover {
+            color: var(--primary-color);
+        }
+
+
+        /* ===================================
+           بخش جدید: واکنش‌گرایی (Responsiveness)
+           =================================== */
+        /* Laptop (1366px) */
+        @media (max-width: 1366px) {
+             .container {
+                max-width: 1140px;
+             }
+        }
+        
+        /* Tablet (768px - 992px) */
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-areas:
+                    "gauge1 gauge2"
+                    "soundwave soundwave"
+                    "bars bars"
+                    "loading loading"
+                    "tests tests";
+            }
+        }
+
+        /* Mobile ( up to 768px) */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background-color: rgba(13, 12, 29, 0.95);
+                backdrop-filter: blur(10px);
+                z-index: 100;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+            }
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+                z-index: 101;
+            }
+             .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+             .hamburger.active span:nth-child(2) { opacity: 0; }
+             .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+
+            .container {
+                grid-template-columns: 1fr;
+                 grid-template-areas:
+                    "gauge1"
+                    "gauge2"
+                    "soundwave"
+                    "bars"
+                    "loading"
+                    "tests";
+            }
+            #bars-widget {
+                flex-direction: column;
+                align-items: stretch;
+            }
+             #tests-widget {
+                justify-content: center;
+             }
+        }
+
+    </style>
+</head>
+<body>
+    
+    <!-- ================ بخش منوی ناوبری ================ -->
+    <nav>
+        <div class="nav-left">
+            <button class="back-button" onclick="history.back()" title="بازگشت">
+                <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"></path></svg>
+            </button>
+            <a href="#" class="logo">
+                <div class="logo-text">هکتوریا سیستم</div>
+                <div class="logo-icon"></div>
+            </a>
+        </div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="index.html">خانه</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+    
+    <!-- ================ بخش داشبورد اصلی ================ -->
+    <div class="container">
+        <!-- ویجت‌ها اینجا قرار می‌گیرند (بدون تغییر نسبت به کد قبل) -->
+         <div class="widget" id="soundwave-widget">
+            <div class="soundwave-container" id="soundwave-container"></div>
+        </div>
+        <div class="widget gauge-widget" id="gauge1">
+            <div class="gauge-circle" id="battery-gauge">
+                <div class="gauge-inner">
+                    <div class="gauge-value" id="battery-value">--</div>
+                    <div class="gauge-label">درصد باتری</div>
+                </div>
+            </div>
+        </div>
+        <div class="widget gauge-widget" id="gauge2">
+             <div class="gauge-circle" id="cpu-gauge">
+                <div class="gauge-inner">
+                    <div class="gauge-value" id="cpu-value">--</div>
+                    <div class="gauge-label">هسته پردازنده</div>
+                </div>
+            </div>
+        </div>
+        <div class="widget" id="bars-widget">
+             <div class="bar-group">
+                <div class="bar-percentage" id="ram-percentage">-- GB</div>
+                <div class="bar-wrapper"> <div class="bar" id="ram-bar" style="height: 0%;"></div> </div>
+                <div class="bar-label">حافظه رم (RAM)</div>
+            </div>
+             <div class="bar-group">
+                <div class="bar-percentage" id="gpu-percentage">GPU</div>
+                 <div class="bar-wrapper"> <div class="bar" id="gpu-bar" style="height: 80%;"></div> </div>
+                 <div class="bar-label" id="gpu-label">پردازنده گرافیکی</div>
+            </div>
+             <div class="bar-group">
+                <div class="bar-percentage" id="browser-percentage">مرورگر</div>
+                 <div class="bar-wrapper"> <div class="bar" id="browser-bar" style="height: 60%;"></div> </div>
+                 <div class="bar-label" id="browser-label">مرورگر</div>
+            </div>
+        </div>
+        <div class="widget" id="loading-widget">
+            <div class="widget-title">اطلاعات کلی</div>
+            <div class="info-item">
+                <span class="info-label">سیستم عامل:</span>
+                <span class="info-value" id="os-info">...</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">آدرس IP:</span>
+                <span class="info-value" id="ip-info">...</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">رزولوشن صفحه:</span>
+                <span class="info-value" id="screen-info">...</span>
+            </div>
+        </div>
+        <div class="widget" id="tests-widget">
+            <div class="widget-title">تست های سخت افزاری</div>
+            <button class="test-btn" id="mic-test-btn">تست میکروفون</button>
+            <button class="test-btn" onclick="runDisplayTest('red')">تست رنگ قرمز</button>
+            <button class="test-btn" onclick="runDisplayTest('green')">تست رنگ سبز</button>
+            <button class="test-btn" onclick="runDisplayTest('blue')">تست رنگ آبی</button>
+            <button class="test-btn" onclick="runDisplayTest('black')">تست رنگ مشکی</button>
+        </div>
+    </div>
+    
+    <!-- ================ بخش فوتر ================ -->
+    <footer>
+        <div class="glow-divider"></div>
+        <div class="footer-content">
+            <p>© هکتوریا | تمامی حقوق محفوظ است.</p>
+
+        </div>
+    </footer>
+    
+    <div class="display-test-overlay" id="display-test-overlay" onclick="this.style.display='none'"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elements (همان کد قبلی) ---
+            const batteryValueEl = document.getElementById('battery-value');
+            const batteryGaugeEl = document.getElementById('battery-gauge');
+            const cpuValueEl = document.getElementById('cpu-value');
+            const cpuGaugeEl = document.getElementById('cpu-gauge');
+            const ramBarEl = document.getElementById('ram-bar');
+            const ramPercentageEl = document.getElementById('ram-percentage');
+            const gpuLabelEl = document.getElementById('gpu-label');
+            const browserLabelEl = document.getElementById('browser-label');
+            const osInfoEl = document.getElementById('os-info');
+            const ipInfoEl = document.getElementById('ip-info');
+            const screenInfoEl = document.getElementById('screen-info');
+            const micTestBtn = document.getElementById('mic-test-btn');
+            const soundwaveContainer = document.getElementById('soundwave-container');
+            const numSoundBars = 50;
+
+            for (let i = 0; i < numSoundBars; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'soundwave-bar';
+                bar.style.height = `${Math.random() * 50 + 5}%`;
+                soundwaveContainer.appendChild(bar);
+            }
+            
+            // --- توابع دریافت اطلاعات (همان کد قبلی) ---
+            const updateGauge = (element, value, maxValue) => { /*...*/ 
+                 const percentage = Math.min(100, Math.max(0, (value / maxValue) * 100));
+                const deg = (percentage / 100) * 360;
+                element.style.background = `conic-gradient(var(--primary-color) ${deg}deg, var(--border-color) ${deg}deg)`;
+            };
+            const getBatteryInfo = async () => { /*...*/ 
+                try { if ('getBattery' in navigator) { const battery = await navigator.getBattery(); const updateBatteryUI = () => { const level = Math.floor(battery.level * 100); batteryValueEl.textContent = `${level}%`; updateGauge(batteryGaugeEl, level, 100); }; updateBatteryUI(); battery.addEventListener('levelchange', updateBatteryUI); battery.addEventListener('chargingchange', updateBatteryUI); } else { batteryValueEl.textContent = 'N/A'; } } catch (err) { batteryValueEl.textContent = 'خطا'; }
+            };
+            const getCPUInfo = () => { /*...*/ 
+                 if ('hardwareConcurrency' in navigator) { const coreCount = navigator.hardwareConcurrency; cpuValueEl.textContent = coreCount; updateGauge(cpuGaugeEl, coreCount, 16); } else { cpuValueEl.textContent = 'N/A'; }
+            };
+            const getRAMInfo = () => { /*...*/ 
+                 if ('deviceMemory' in navigator) { const ram = navigator.deviceMemory; ramPercentageEl.textContent = `${ram} GB`; ramBarEl.style.height = `${Math.min(100, (ram / 32) * 100)}%`; } else { ramPercentageEl.textContent = 'N/A'; }
+            };
+            const getGeneralInfo = () => { /*...*/
+                 if(navigator.userAgentData){ osInfoEl.textContent = navigator.userAgentData.platform; const brand = navigator.userAgentData.brands.find(b => b.brand !== "Not A;Brand"); if (brand) { browserLabelEl.textContent = `${brand.brand} ${brand.version}`; } else { browserLabelEl.textContent = 'مرورگر'; } } else { osInfoEl.textContent = navigator.platform; browserLabelEl.textContent = 'مرورگر';} screenInfoEl.textContent = `${window.screen.width}x${window.screen.height}`;
+            };
+            const getIPInfo = async () => { /*...*/ 
+                try { const response = await fetch('https://api.ipify.org?format=json'); const data = await response.json(); ipInfoEl.textContent = data.ip; } catch (error) { ipInfoEl.textContent = 'دریافت نشد'; }
+            };
+            const getGPUInfo = () => { /*...*/ 
+                const canvas = document.createElement('canvas'); const gl = canvas.getContext('webgl'); if (gl) { const debugInfo = gl.getExtension('WEBGL_debug_renderer_info'); if(debugInfo) { const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL); gpuLabelEl.textContent = renderer.substring(0, 15) + '...'; } else { gpuLabelEl.textContent = 'GPU نامشخص'; } } else { gpuLabelEl.textContent = 'WebGL پشتیبانی نمی‌شود'; }
+            };
+            
+            // --- Microphone Test Logic (همان کد قبلی) ---
+            let isMicTestRunning = false, audioContext, analyser, source, dataArray, animationFrameId;
+            micTestBtn.addEventListener('click', () => { if (isMicTestRunning) { cancelAnimationFrame(animationFrameId); source.disconnect(); audioContext.close(); micTestBtn.textContent = 'تست میکروفون'; isMicTestRunning = false; const bars = soundwaveContainer.querySelectorAll('.soundwave-bar'); bars.forEach(bar => bar.style.height = `${Math.random() * 50 + 5}%`); } else { startMicTest(); } });
+            async function startMicTest() { try { const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); audioContext = new (window.AudioContext)(); analyser = audioContext.createAnalyser(); source = audioContext.createMediaStreamSource(stream); source.connect(analyser); dataArray = new Uint8Array(analyser.frequencyBinCount); isMicTestRunning = true; micTestBtn.textContent = 'توقف تست'; drawSoundwave(); } catch (err) { alert('دسترسی به میکروفون امکان‌پذیر نیست.'); } }
+            function drawSoundwave() { animationFrameId = requestAnimationFrame(drawSoundwave); analyser.getByteFrequencyData(dataArray); const bars = soundwaveContainer.querySelectorAll('.soundwave-bar'); for (let i = 0; i < bars.length; i++) { const barHeight = (dataArray[Math.floor((i / bars.length) * dataArray.length)] / 255) * 100; bars[i].style.height = `${Math.max(5, barHeight)}%`; } }
+
+            // --- اجرای تمام توابع ---
+            getBatteryInfo(); getCPUInfo(); getRAMInfo(); getGeneralInfo(); getIPInfo(); getGPUInfo();
+
+            /* ===================================
+               بخش جدید: اسکریپت منوی همبرگری
+               =================================== */
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('nav-links');
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        });
+        
+        // --- Display Test (همان کد قبلی) ---
+        function runDisplayTest(color) {
+            const overlay = document.getElementById('display-test-overlay');
+            overlay.style.backgroundColor = color;
+            overlay.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

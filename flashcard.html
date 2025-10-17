@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سازنده فلش‌کارت تعاملی هکتوریا</title>
+    
+    <!-- فونت پیشنهادی (برای نمایش بهتر، این لینک را می‌توانید با فونت دلخواه خود جایگزین کنید) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =================================
+           بخش ۱: استایل‌های پایه و عمومی
+           ================================= */
+        :root {
+            --bg-color: #12121c;
+            --glass-bg: rgba(26, 26, 42, 0.6);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --primary-color: #0abf53;
+            --secondary-color: #7b2cbf;
+            --danger-color: #e53935;
+            --warning-color: #fdd835;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --font-family: 'Vazirmatn', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            direction: rtl;
+            text-align: right;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* افکت پس‌زمینه متحرک "نور در مه" */
+        .background-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+        }
+        .blob1 { width: 400px; height: 400px; background: #6a0dad; top: -150px; left: -150px; animation: move 25s infinite alternate; }
+        .blob2 { width: 300px; height: 300px; background: #0077b6; bottom: -100px; right: -100px; animation: move 30s infinite alternate-reverse; }
+        .blob3 { width: 250px; height: 250px; background: #0abf53; top: 50%; left: 30%; animation: move 20s infinite alternate; }
+        
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 50px) scale(1.2); }
+        }
+
+        /* =================================
+           بخش ۲: استایل کامپوننت‌های عمومی
+           ================================= */
+        
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        button, .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: var(--font-family);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:hover, .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(10, 191, 83, 0.4);
+        }
+
+        .btn-secondary { background-color: var(--secondary-color); }
+        .btn-secondary:hover { box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4); }
+
+        .btn-danger { background-color: var(--danger-color); }
+        .btn-danger:hover { box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4); }
+        
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-family: var(--font-family);
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(10, 191, 83, 0.3);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        /* =================================
+           بخش ۳: ساختار و لایه‌بندی اصلی
+           ================================= */
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ستون کناری (مجموعه‌ها) */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sets-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-left: 10px;
+        }
+        .sets-list li {
+            background-color: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sets-list li.active, .sets-list li:hover {
+            background-color: rgba(10, 191, 83, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .set-item-actions button {
+            background: none;
+            padding: 5px;
+        }
+        .set-item-actions button:hover {
+             transform: none;
+             box-shadow: none;
+             color: var(--danger-color);
+        }
+
+        /* پنل اصلی محتوا */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        /* کارت‌های داخل پنل اصلی */
+        #cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .card-item {
+            background-color: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            position: relative;
+        }
+        .card-item .front { font-weight: bold; }
+        .card-item .back { color: var(--text-muted); font-size: 0.9em; }
+        .card-item-actions {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .card-item:hover .card-item-actions { opacity: 1; }
+
+        /* حالت مرور فلش‌کارت */
+        #review-mode {
+            text-align: center;
+        }
+
+        .flashcard-scene {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            perspective: 1000px;
+            margin: 2rem auto;
+        }
+        
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+            cursor: pointer;
+        }
+        
+        .flashcard.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+        
+        .flashcard-face-front {
+            background: linear-gradient(45deg, rgba(123, 44, 191, 0.8), rgba(107, 33, 168, 0.8));
+        }
+
+        .flashcard-face-back {
+            background: linear-gradient(45deg, rgba(10, 191, 83, 0.8), rgba(8, 148, 65, 0.8));
+            transform: rotateY(180deg);
+        }
+        
+        #review-controls, #rating-controls {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        #rating-controls .btn-rate-again { background-color: var(--danger-color); }
+        #rating-controls .btn-rate-again:hover { box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4); }
+        #rating-controls .btn-rate-hard { background-color: var(--warning-color); color: #333;}
+        #rating-controls .btn-rate-hard:hover { box-shadow: 0 4px 15px rgba(253, 216, 53, 0.4); }
+        #rating-controls .btn-rate-easy { background-color: var(--primary-color); }
+
+        /* پاورقی (Footer) */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 3rem;
+            position: relative;
+        }
+        /* خط نئونی متحرک */
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), var(--secondary-color), transparent);
+            box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--secondary-color);
+            animation: animate-line 5s linear infinite;
+        }
+
+        @keyframes animate-line {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        /* هیدن کردن بخش‌ها */
+        .hidden { display: none !important; }
+
+        /* =================================
+           بخش ۴: واکنش‌گرایی (Responsive)
+           ================================= */
+        @media (max-width: 992px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                order: 2; /* سایدبار در موبایل پایین‌تر نمایش داده شود */
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .app-container { padding: 1rem; }
+            .glass-panel { padding: 1.5rem; }
+            header h1 { font-size: 2rem; }
+            .flashcard-scene { height: 250px; }
+            .flashcard-face { font-size: 1.2rem; }
+            #review-controls, #rating-controls { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- المان‌های پس‌زمینه -->
+    <div class="background-blobs">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+    </div>
+
+    <header>
+        <h1>هکتوریا کارت</h1>
+        <p>فلش کارت حرفه ای و کاربردی</p>
+    </header>
+
+    <main class="app-container">
+        <!-- ستون کناری: مدیریت مجموعه‌ها -->
+        <aside class="sidebar">
+            <div class="glass-panel">
+                <h2>مجموعه‌ها</h2>
+                <ul id="sets-list" class="sets-list">
+                    <!-- مجموعه‌ها به صورت داینامیک اینجا اضافه می‌شوند -->
+                </ul>
+                <button id="add-set-btn" style="width: 100%; margin-top: 1rem;">+ ایجاد مجموعه جدید</button>
+            </div>
+             <div class="glass-panel">
+                <h2>پشتیبان‌گیری</h2>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <button id="export-btn" class="btn-secondary">📥 ذخیره فایل پشتیبان</button>
+                    <button id="import-btn" class="btn-secondary">📤 بارگذاری فایل پشتیبان</button>
+                    <input type="file" id="import-file-input" class="hidden" accept=".json,.hfc">
+                </div>
+            </div>
+        </aside>
+
+        <!-- محتوای اصلی -->
+        <div class="main-content">
+            
+            <!-- نمایش خوش‌آمدگویی یا مدیریت کارت‌ها -->
+            <div id="set-management-view">
+                 <div class="glass-panel" id="welcome-panel">
+                    <h2>به هکتوریا خوش آمدید!</h2>
+                    <p>برای شروع، یک مجموعه جدید از ستون کناری بسازید یا یکی از مجموعه‌های موجود را انتخاب کنید.</p>
+                </div>
+                <div class="glass-panel hidden" id="card-management-panel">
+                    <h2 id="current-set-name"></h2>
+                    <p id="current-set-stats"></p>
+                    <button id="start-review-btn" style="margin-bottom: 1.5rem;">🚀 شروع مرور</button>
+                    <hr style="border-color: var(--border-color); margin-bottom: 1.5rem;">
+                    
+                    <h3>افزودن کارت جدید</h3>
+                    <form id="add-card-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <textarea id="card-front" placeholder="روی کارت (سوال)" required></textarea>
+                        <textarea id="card-back" placeholder="پشت کارت (پاسخ)" required></textarea>
+                        <button type="submit">افزودن کارت</button>
+                    </form>
+                    
+                    <h3 style="margin-top: 2rem;">کارت‌های این مجموعه</h3>
+                    <div id="cards-container">
+                        <!-- کارت‌ها به صورت داینامیک اینجا اضافه می‌شوند -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- حالت مرور -->
+            <div id="review-mode" class="glass-panel hidden">
+                <div class="flashcard-scene">
+                    <div class="flashcard" id="flashcard">
+                        <div class="flashcard-face flashcard-face-front" id="review-card-front"></div>
+                        <div class="flashcard-face flashcard-face-back" id="review-card-back"></div>
+                    </div>
+                </div>
+                <div id="review-controls">
+                    <button id="show-answer-btn">نمایش پاسخ</button>
+                </div>
+                <div id="rating-controls" class="hidden">
+                    <button class="btn-rate-again">دوباره (۱م)</button>
+                    <button class="btn-rate-hard">سخت (۱۲م)</button>
+                    <button class="btn-rate-easy">آسان (۴ر)</button>
+                </div>
+                <p id="review-progress" style="margin-top: 1rem;"></p>
+                <button id="back-to-manage-btn" style="margin-top: 1rem;" class="btn-secondary">بازگشت</button>
+            </div>
+
+        </div>
+    </main>
+    
+    <footer>
+        <p>© هکتوریا | قدرت گرفته از خلاقیت</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // =================================
+            // بخش ۱: تعریف متغیرها و المان‌های DOM
+            // =================================
+            const STORAGE_KEY = 'hectoria_flashcards_data';
+            
+            // المان‌های مدیریت مجموعه
+            const addSetBtn = document.getElementById('add-set-btn');
+            const setsList = document.getElementById('sets-list');
+            const welcomePanel = document.getElementById('welcome-panel');
+            const cardManagementPanel = document.getElementById('card-management-panel');
+            const currentSetNameEl = document.getElementById('current-set-name');
+            const currentSetStatsEl = document.getElementById('current-set-stats');
+
+            // المان‌های مدیریت کارت
+            const addCardForm = document.getElementById('add-card-form');
+            const cardFrontInput = document.getElementById('card-front');
+            const cardBackInput = document.getElementById('card-back');
+            const cardsContainer = document.getElementById('cards-container');
+            const startReviewBtn = document.getElementById('start-review-btn');
+
+            // المان‌های حالت مرور
+            const setManagementView = document.getElementById('set-management-view');
+            const reviewModeView = document.getElementById('review-mode');
+            const flashcard = document.getElementById('flashcard');
+            const reviewCardFront = document.getElementById('review-card-front');
+            const reviewCardBack = document.getElementById('review-card-back');
+            const showAnswerBtn = document.getElementById('show-answer-btn');
+            const ratingControls = document.getElementById('rating-controls');
+            const reviewProgress = document.getElementById('review-progress');
+            const backToManageBtn = document.getElementById('back-to-manage-btn');
+            
+            // المان‌های Import/Export
+            const exportBtn = document.getElementById('export-btn');
+            const importBtn = document.getElementById('import-btn');
+            const importFileInput = document.getElementById('import-file-input');
+
+            // state برنامه: برای نگهداری تمام داده‌ها
+            let state = {
+                sets: {}, // { setId: { name: '...', cards: { cardId: {...} } } }
+                activeSetId: null,
+                reviewSession: {
+                    isActive: false,
+                    dueCards: [],
+                    currentCardIndex: 0
+                }
+            };
+
+            // =================================
+            // بخش ۲: مدیریت داده‌ها (LocalStorage)
+            // =================================
+            function saveData() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            }
+
+            function loadData() {
+                const data = localStorage.getItem(STORAGE_KEY);
+                if (data) {
+                    state = JSON.parse(data);
+                }
+                // اطمینان از وجود ساختارهای لازم حتی اگر داده‌ای لود نشود
+                state.sets = state.sets || {};
+                state.activeSetId = state.activeSetId || null;
+                state.reviewSession = state.reviewSession || { isActive: false, dueCards: [], currentCardIndex: 0 };
+            }
+
+            // =================================
+            // بخش ۳: رندر کردن UI (نمایش داده‌ها)
+            // =================================
+
+            // رندر کردن لیست مجموعه‌ها
+            function renderSets() {
+                setsList.innerHTML = '';
+                Object.keys(state.sets).forEach(setId => {
+                    const set = state.sets[setId];
+                    const li = document.createElement('li');
+                    li.dataset.setId = setId;
+                    li.className = state.activeSetId === setId ? 'active' : '';
+                    
+                    const setNameSpan = document.createElement('span');
+                    setNameSpan.textContent = set.name;
+                    
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'set-item-actions';
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = '🗑️';
+                    deleteBtn.className = 'btn-small';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation(); // جلوگیری از انتخاب مجموعه هنگام حذف
+                        deleteSet(setId);
+                    };
+                    
+                    actionsDiv.appendChild(deleteBtn);
+                    li.appendChild(setNameSpan);
+                    li.appendChild(actionsDiv);
+
+                    li.onclick = () => selectSet(setId);
+                    setsList.appendChild(li);
+                });
+            }
+            
+            // رندر کردن کارت‌های مجموعه فعال
+            function renderCards() {
+                if (!state.activeSetId || !state.sets[state.activeSetId]) {
+                    welcomePanel.classList.remove('hidden');
+                    cardManagementPanel.classList.add('hidden');
+                    return;
+                }
+
+                welcomePanel.classList.add('hidden');
+                cardManagementPanel.classList.remove('hidden');
+
+                const activeSet = state.sets[state.activeSetId];
+                currentSetNameEl.textContent = `مجموعه: ${activeSet.name}`;
+                
+                const cardCount = Object.keys(activeSet.cards).length;
+                const dueCount = getDueCards(state.activeSetId).length;
+                currentSetStatsEl.textContent = `${cardCount} کارت در کل. ${dueCount} کارت آماده مرور.`;
+
+                cardsContainer.innerHTML = '';
+                Object.keys(activeSet.cards).forEach(cardId => {
+                    const card = activeSet.cards[cardId];
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card-item';
+                    cardDiv.innerHTML = `
+                        <div class="front">${card.front}</div>
+                        <div class="back">${card.back}</div>
+                        <div class="card-item-actions">
+                           <button class="btn-small btn-danger" data-card-id="${cardId}">🗑️</button>
+                        </div>
+                    `;
+                    cardsContainer.appendChild(cardDiv);
+                });
+                
+                // افزودن Event Listener برای دکمه حذف کارت
+                 cardsContainer.querySelectorAll('.btn-danger').forEach(btn => {
+                     btn.onclick = () => deleteCard(btn.dataset.cardId);
+                 });
+            }
+
+            function renderAll() {
+                renderSets();
+                renderCards();
+            }
+
+            // =================================
+            // بخش ۴: منطق برنامه (ایجاد، حذف، انتخاب)
+            // =================================
+
+            // ایجاد مجموعه جدید
+            function createSet() {
+                const setName = prompt('نام مجموعه جدید را وارد کنید:');
+                if (setName && setName.trim() !== '') {
+                    const setId = 'set_' + Date.now();
+                    state.sets[setId] = {
+                        name: setName.trim(),
+                        cards: {}
+                    };
+                    selectSet(setId);
+                    saveData();
+                    renderAll();
+                }
+            }
+            
+            function deleteSet(setId) {
+                 if (confirm(`آیا از حذف مجموعه "${state.sets[setId].name}" مطمئن هستید؟`)) {
+                    delete state.sets[setId];
+                    if (state.activeSetId === setId) {
+                        state.activeSetId = null;
+                    }
+                    saveData();
+                    renderAll();
+                }
+            }
+
+            function selectSet(setId) {
+                state.activeSetId = setId;
+                // view را ریست کن
+                setManagementView.classList.remove('hidden');
+                reviewModeView.classList.add('hidden');
+                state.reviewSession.isActive = false;
+                renderAll();
+            }
+
+            // افزودن کارت جدید
+            function addCard(front, back) {
+                if (!state.activeSetId) return;
+
+                const cardId = 'card_' + Date.now();
+                state.sets[state.activeSetId].cards[cardId] = {
+                    front,
+                    back,
+                    // زمان مرور بعدی برای کارت جدید، همین الان است
+                    nextReviewDate: Date.now() 
+                };
+                saveData();
+                renderCards(); // فقط کارت‌ها را رندر مجدد کن
+            }
+            
+            function deleteCard(cardId) {
+                if (!state.activeSetId || !state.sets[state.activeSetId].cards[cardId]) return;
+                
+                if (confirm('آیا از حذف این کارت مطمئن هستید؟')) {
+                    delete state.sets[state.activeSetId].cards[cardId];
+                    saveData();
+                    renderCards();
+                }
+            }
+
+            // =========================================
+            // بخش ۵: منطق مرور (Spaced Repetition)
+            // =========================================
+            
+            // گرفتن کارت‌هایی که زمان مرورشان فرا رسیده
+            function getDueCards(setId) {
+                const set = state.sets[setId];
+                if (!set) return [];
+                const now = Date.now();
+                return Object.keys(set.cards)
+                    .map(cardId => ({ id: cardId, ...set.cards[cardId] }))
+                    .filter(card => card.nextReviewDate <= now);
+            }
+
+            function startReview() {
+                if (!state.activeSetId) return;
+
+                const dueCards = getDueCards(state.activeSetId);
+                if (dueCards.length === 0) {
+                    alert('هیچ کارتی برای مرور وجود ندارد. آفرین!');
+                    return;
+                }
+                
+                state.reviewSession = {
+                    isActive: true,
+                    dueCards: dueCards.sort(() => Math.random() - 0.5), // کارت‌ها را بر بزن
+                    currentCardIndex: 0
+                };
+                
+                setManagementView.classList.add('hidden');
+                reviewModeView.classList.remove('hidden');
+
+                showNextReviewCard();
+            }
+
+            function showNextReviewCard() {
+                if (state.reviewSession.currentCardIndex >= state.reviewSession.dueCards.length) {
+                    alert('مرور این بخش تمام شد!');
+                    endReview();
+                    return;
+                }
+
+                // ریست کردن UI
+                flashcard.classList.remove('is-flipped');
+                ratingControls.classList.add('hidden');
+                showAnswerBtn.classList.remove('hidden');
+
+                const card = state.reviewSession.dueCards[state.reviewSession.currentCardIndex];
+                reviewCardFront.textContent = card.front;
+                reviewCardBack.textContent = card.back;
+                
+                reviewProgress.textContent = `کارت ${state.reviewSession.currentCardIndex + 1} از ${state.reviewSession.dueCards.length}`;
+            }
+
+            function handleRating(rating) {
+                const card = state.reviewSession.dueCards[state.reviewSession.currentCardIndex];
+                const now = Date.now();
+                
+                // تعریف فواصل زمانی به میلی‌ثانیه
+                const MINUTE = 60 * 1000;
+                const DAY = 24 * 60 * MINUTE;
+
+                let nextReviewDate;
+                if (rating === 'again') {
+                    nextReviewDate = now + 1 * MINUTE;
+                } else if (rating === 'hard') {
+                    nextReviewDate = now + 12 * MINUTE;
+                } else if (rating === 'easy') {
+                    nextReviewDate = now + 4 * DAY;
+                }
+                
+                // آپدیت زمان مرور در state اصلی
+                state.sets[state.activeSetId].cards[card.id].nextReviewDate = nextReviewDate;
+                saveData();
+
+                // رفتن به کارت بعدی
+                state.reviewSession.currentCardIndex++;
+                showNextReviewCard();
+            }
+
+            function endReview() {
+                state.reviewSession.isActive = false;
+                setManagementView.classList.remove('hidden');
+                reviewModeView.classList.add('hidden');
+                renderCards(); // آپدیت آمار کارت‌های آماده مرور
+            }
+            
+            // =========================================
+            // بخش ۶: منطق Import/Export
+            // =========================================
+            function exportData() {
+                const dataStr = JSON.stringify(state, null, 2); // فرمت زیبا برای خوانایی
+                const blob = new Blob([dataStr], {type: "application/json"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const date = new Date().toISOString().slice(0, 10);
+                a.href = url;
+                a.download = `hectoria_backup_${date}.hfc`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            function importData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedState = JSON.parse(e.target.result);
+                        // یک اعتبارسنجی ساده
+                        if (importedState && typeof importedState.sets === 'object') {
+                             if (confirm('آیا می‌خواهید داده‌های فعلی با فایل پشتیبان جایگزین شوند؟')) {
+                                state = importedState;
+                                saveData();
+                                renderAll();
+                                alert('داده‌ها با موفقیت بارگذاری شدند.');
+                            }
+                        } else {
+                            throw new Error('فرمت فایل نامعتبر است.');
+                        }
+                    } catch (error) {
+                        alert('خطا در بارگذاری فایل: ' + error.message);
+                    }
+                    // اینپوت فایل را ریست کن تا امکان انتخاب مجدد همان فایل وجود داشته باشد
+                    importFileInput.value = ''; 
+                };
+                reader.readAsText(file);
+            }
+
+            // =================================
+            // بخش ۷: ثبت Event Listener ها
+            // =================================
+            addSetBtn.addEventListener('click', createSet);
+            
+            addCardForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const front = cardFrontInput.value.trim();
+                const back = cardBackInput.value.trim();
+                if (front && back) {
+                    addCard(front, back);
+                    addCardForm.reset();
+                    cardFrontInput.focus();
+                }
+            });
+
+            startReviewBtn.addEventListener('click', startReview);
+            backToManageBtn.addEventListener('click', endReview);
+
+            flashcard.addEventListener('click', () => {
+                flashcard.classList.add('is-flipped');
+                showAnswerBtn.classList.add('hidden');
+                ratingControls.classList.remove('hidden');
+            });
+            showAnswerBtn.addEventListener('click', () => {
+                 flashcard.classList.add('is-flipped');
+                 showAnswerBtn.classList.add('hidden');
+                 ratingControls.classList.remove('hidden');
+            });
+
+            ratingControls.querySelector('.btn-rate-again').addEventListener('click', () => handleRating('again'));
+            ratingControls.querySelector('.btn-rate-hard').addEventListener('click', () => handleRating('hard'));
+            ratingControls.querySelector('.btn-rate-easy').addEventListener('click', () => handleRating('easy'));
+            
+            exportBtn.addEventListener('click', exportData);
+            importBtn.addEventListener('click', () => importFileInput.click());
+            importFileInput.addEventListener('change', importData);
+
+            // =================================
+            // بخش ۸: اجرای اولیه برنامه
+            // =================================
+            loadData();
+            renderAll();
+        });
+
+    </script>
+</body>
+</html>

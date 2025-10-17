@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دایرةالمعارف میکروبی هکتوریا</title>
+    
+    <!-- بخش فونت: فونت وزیرمتن از گوگل فراخوانی می‌شود. دیگر نیازی به کد طولانی نیست -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- استایل‌های کلی --- */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f4f7f9;
+            --card-background: rgba(255, 255, 255, 0.65);
+            --text-color: #212529;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* افکت پس‌زمینه نوری */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 123, 255, 0.1), transparent 70%);
+            filter: blur(100px);
+            z-index: -1;
+            animation: move-light1 15s infinite alternate;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(23, 162, 184, 0.1), transparent 70%);
+            filter: blur(100px);
+            z-index: -1;
+            animation: move-light2 20s infinite alternate;
+        }
+
+        @keyframes move-light1 {
+            from { transform: translate(-20%, -20%); }
+            to { transform: translate(20%, 20%); }
+        }
+        @keyframes move-light2 {
+            from { transform: translate(20%, 20%); }
+            to { transform: translate(-20%, -20%); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* استایل گلس‌مورفیسم برای پنل‌ها و کارت‌ها */
+        .glass-panel {
+            background: var(--card-background);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        /* --- نوار ناوبری (Navbar) --- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--card-background);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        /* --- مودال نام کاربری --- */
+        .modal {
+            display: none; /* در ابتدا مخفی */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        /* --- استایل فرم‌ها و دکمه‌ها --- */
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        /* --- بخش‌های محتوا --- */
+        .welcome-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .staining-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .staining-tabs button {
+            background-color: #e9ecef;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .staining-tabs button:hover {
+            background-color: #ced4da;
+        }
+        
+        .staining-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .staining-table th, .staining-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: right;
+        }
+        .staining-table th {
+            background-color: #e9ecef;
+        }
+        
+        #morphology-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .bacterium-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .bacterium-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px var(--shadow-color);
+        }
+
+        .bacterium-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+        
+        .bacterium-card-content {
+            padding: 15px;
+        }
+        
+        .bacterium-card-content p {
+            margin-bottom: 5px;
+        }
+        
+        #search-history {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        #search-history span {
+            background-color: #e9ecef;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #search-history span:hover {
+            background-color: #ced4da;
+        }
+        
+        .comparison-tool select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        #comparison-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* --- پاورقی (Footer) --- */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .glow-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            margin: -21px auto 20px auto;
+            width: 50%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- ==================================== -->
+    <!--          MODAL: دریافت نام کاربری       -->
+    <!-- ==================================== -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content glass-panel">
+            <h2>به هکتوریا خوش آمدید!</h2>
+            <p>لطفاً نام خود را برای شخصی‌سازی تجربه کاربری وارد کنید.</p>
+            <form id="user-form" style="margin-top: 20px;">
+                <input type="text" id="username-input" class="form-input" placeholder="نام شما..." required>
+                <button type="submit" class="btn">ذخیره و ورود</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- ==================================== -->
+    <!--         PLACEHOLDER: نوار ناوبری         -->
+    <!-- ==================================== -->
+    <nav class="navbar">
+        <!-- برای تغییر لوگو یا نام، این بخش را ویرایش کنید -->
+        <div class="navbar-brand">هکتوریا</div>
+        
+        <!-- برای تغییر لینک‌ها، تگ‌های <a> زیر را ویرایش کنید -->
+        <div class="navbar-links">
+            <a href="#staining-section">مرجع رنگ‌آمیزی</a>
+            <a href="#morphology-section">بانک مورفولوژی</a>
+            <a href="#comparison-section">ابزار مقایسه</a>
+            <!-- <a href="#">کشف ابزارها</a> -->
+            <!-- <a href="#">تیم ما</a> -->
+        </div>
+    </nav>
+    
+    <div class="container">
+
+        <!-- ==================================== -->
+        <!--            بخش خوشامدگویی             -->
+        <!-- ==================================== -->
+        <section id="welcome-section" class="welcome-section glass-panel">
+            <h1 id="welcome-message">به دایرةالمعارف میکروبی هکتوریا خوش آمدید!</h1>
+            <p>مرجع جامع شما برای رنگ‌آمیزی‌ها، مورفولوژی باکتری‌ها و ابزارهای مقایسه‌ای</p>
+        </section>
+
+        <!-- ==================================== -->
+        <!--         بخش مرجع رنگ‌آمیزی            -->
+        <!-- ==================================== -->
+        <section id="staining-section" class="glass-panel">
+            <h2>مرجع سریع رنگ‌آمیزی</h2>
+            <div id="staining-tabs" class="staining-tabs">
+                <button class="btn" data-stain="gram">رنگ‌آمیزی گرم</button>
+                <button class="btn" data-stain="acid-fast">اسید فست</button>
+                <button class="btn" data-stain="spore">اسپور</button>
+                <button class="btn" data-stain="capsule">کپسول</button>
+            </div>
+            <div id="staining-steps-display">
+                <p>برای مشاهده مراحل، یکی از روش‌های رنگ‌آمیزی بالا را انتخاب کنید.</p>
+            </div>
+        </section>
+
+        <!-- ==================================== -->
+        <!--           بانک مورفولوژی             -->
+        <!-- ==================================== -->
+        <section id="morphology-section" class="glass-panel">
+            <h2>بانک مورفولوژی باکتری‌ها</h2>
+            <input type="text" id="search-input" class="form-input" placeholder="جستجوی باکتری بر اساس نام، شکل یا نوع رنگ‌آمیزی...">
+            
+            <div>
+                <h3>تاریخچه جستجو:</h3>
+                <div id="search-history">
+                    <small>جستجویی ثبت نشده است.</small>
+                </div>
+            </div>
+            
+            <div id="morphology-grid">
+                <!-- کارت‌های باکتری‌ها در اینجا توسط جاوا اسکریپت اضافه می‌شوند -->
+            </div>
+        </section>
+
+        <!-- ==================================== -->
+        <!--             ابزار مقایسه              -->
+        <!-- ==================================== -->
+        <section id="comparison-section" class="glass-panel">
+            <h2>ابزار مقایسه باکتری‌ها</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label for="bacterium1-select">باکتری اول:</label>
+                    <select id="bacterium1-select" class="form-input"></select>
+                </div>
+                <div>
+                    <label for="bacterium2-select">باکتری دوم:</label>
+                    <select id="bacterium2-select" class="form-input"></select>
+                </div>
+            </div>
+            <div id="comparison-display" style="margin-top: 20px;">
+                 <p>دو باکتری را برای مقایسه انتخاب کنید.</p>
+            </div>
+        </section>
+        
+    </div>
+    
+    <!-- ==================================== -->
+    <!--         PLACEHOLDER: پاورقی           -->
+    <!-- ==================================== -->
+    <footer class="footer">
+        <div class="glow-line"></div>
+        <!-- برای تغییر متن کپی‌رایت، این بخش را ویرایش کنید -->
+        <p>© <span id="current-year"></span> هکتوریا. تمام حقوق محفوظ است.</p>
+        <p>سعید رستمی</p>
+        
+        <!-- برای تغییر لینک‌های حقوقی، این بخش را ویرایش کنید -->
+        <div class="footer-links">
+            <!-- <a href="#">سیاست حریم خصوصی</a> | <a href="#">شرایط استفاده</a> -->
+        </div>
+    </footer>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // ===============================================
+        //     بخش داده‌ها (Data Banks)
+        // این بخش‌ها باید توسط محقق تکمیل شوند
+        // ===============================================
+
+        // --- داده‌های مراحل رنگ‌آمیزی ---
+        const STAINING_DATA = {
+            gram: {
+                title: "مراحل رنگ‌آمیزی گرم",
+                steps: [
+                    { step: 1, action: "رنگ‌آمیزی با کریستال ویوله", duration: "1 دقیقه", note: "رنگ اولیه که تمام سلول‌ها را بنفش می‌کند." },
+                    { step: 2, action: "شستشو با آب", duration: "چند ثانیه", note: "حذف رنگ اضافی." },
+                    { step: 3, action: "افزودن لوگول (ید)", duration: "1 دقیقه", note: "به عنوان تثبیت کننده (mordant) عمل می‌کند." },
+                    { step: 4, action: "رنگ‌بری با الکل استن", duration: "10-20 ثانیه", note: "مهم‌ترین مرحله؛ گرم منفی‌ها بی‌رنگ می‌شوند." },
+                    { step: 5, action: "شستشو با آب", duration: "چند ثانیه", note: "توقف فرآیند رنگ‌بری." },
+                    { step: 6, action: "رنگ‌آمیزی متضاد با سافرانین", duration: "1 دقیقه", note: "گرم منفی‌های بی‌رنگ را قرمز/صورتی می‌کند." },
+                ]
+            },
+            'acid-fast': {
+                title: "مراحل رنگ‌آمیزی اسید فست (زیل-نلسون)",
+                steps: [
+                     { step: 1, action: "پوشاندن گسترش با کربول فوشین", duration: "5-10 دقیقه", note: "به همراه حرارت ملایم (بخار بلند شود اما نجوشد)." },
+                     { step: 2, action: "شستشو با آب", duration: "چند ثانیه", note: "خنک کردن و حذف رنگ اضافی." },
+                     { step: 3, action: "رنگ‌بری با اسید-الکل", duration: "15-30 ثانیه", note: "باکتری‌های غیر اسید فست بی‌رنگ می‌شوند." },
+                     { step: 4, action: "شستشو با آب", duration: "چند ثانیه", note: "توقف فرآیند رنگ‌بری." },
+                     { step: 5, action: "رنگ‌آمیزی متضاد با متیلن بلو", duration: "1 دقیقه", note: "سلول‌های دیگر و پس‌زمینه را آبی می‌کند." },
+                ]
+            },
+            spore: {
+                title: "مراحل رنگ‌آمیزی اسپور (شفر-فولتون)",
+                steps: [
+                    // داده‌های این بخش باید تکمیل شوند
+                    { step: 1, action: "پوشاندن گسترش با مالاشیت گرین", duration: "5 دقیقه", note: "به همراه حرارت ملایم برای نفوذ رنگ به اسپور." },
+                    { step: 2, action: "شستشو با آب", duration: "30 ثانیه", note: "رنگ از سلول‌های رویشی شسته می‌شود." },
+                    { step: 3, action: "رنگ‌آمیزی متضاد با سافرانین", duration: "30-60 ثانیه", note: "سلول‌های رویشی را صورتی/قرمز می‌کند." },
+                ]
+            },
+            capsule: {
+                title: "مراحل رنگ‌آمیزی کپسول (نگاتیو)",
+                steps: [
+                    // داده‌های این بخش باید تکمیل شوند
+                    { step: 1, action: "یک قطره مرکب چین (India Ink) روی لام", duration: "-", note: "ایجاد پس‌زمینه تیره." },
+                    { step: 2, action: "مخلوط کردن نمونه باکتری با مرکب", duration: "-", note: "به آرامی مخلوط شود." },
+                    { step: 3, action: "تهیه گسترش نازک", duration: "-", note: "مانند گسترش خونی." },
+                    { step: 4, action: "خشک شدن در مجاورت هوا", duration: "-", note: "از حرارت استفاده نشود." },
+                    { step: 5, action: "مشاهده زیر میکروسکوپ", duration: "-", note: "کپسول به صورت هاله‌ای شفاف در پس‌زمینه تیره دیده می‌شود." },
+                ]
+            }
+        };
+
+        // --- بانک داده مورفولوژی باکتری‌ها ---
+        const BACTERIA_ATLAS = [
+            {
+                name: "استافیلوکوکوس اورئوس",
+                gram: "گرم مثبت",
+                morphology: "کوکسی خوشه‌ای (شبیه خوشه انگور)",
+                details: "کاتالاز مثبت، کواگولاز مثبت. یکی از مهم‌ترین پاتوژن‌های انسانی.",
+                // IMAGE PLACEHOLDER: یک تصویر با ابعاد پیشنهادی 400x250 پیکسل قرار دهید
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Staphylococcus_aureus_VISA_2.jpg/800px-Staphylococcus_aureus_VISA_2.jpg" 
+            },
+            {
+                name: "اشریشیا کلی",
+                gram: "گرم منفی",
+                morphology: "باسیل مستقیم",
+                details: "عضوی از فلور نرمال روده. برخی سویه‌ها بیماری‌زا هستند. لاکتوز مثبت.",
+                // IMAGE PLACEHOLDER: یک تصویر با ابعاد پیشنهادی 400x250 پیکسل قرار دهید
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/E._coli_Bacteria_%287316101966%29.jpg/800px-E._coli_Bacteria_%287316101966%29.jpg"
+            },
+            {
+                name: "باسیلوس آنتراسیس",
+                gram: "گرم مثبت",
+                morphology: "باسیل بزرگ و اسپوردار (شکل بامبو)",
+                details: "عامل بیماری سیاه‌زخم. اسپور مرکزی و بدون تورم دارد.",
+                // IMAGE PLACEHOLDER: یک تصویر با ابعاد پیشنهادی 400x250 پیکسل قرار دهید
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Bacillus_anthracis.png/800px-Bacillus_anthracis.png"
+            },
+            {
+                name: "کلستریدیوم تتانی",
+                gram: "گرم مثبت",
+                morphology: "باسیل اسپوردار (اسپور انتهایی، شکل چوب طبل)",
+                details: "عامل بیماری کزاز. بی هوازی اجباری.",
+                // IMAGE PLACEHOLDER: یک تصویر با ابعاد پیشنهادی 400x250 پیکسل قرار دهید
+                image: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Clostridium_tetani_01.png"
+            }
+            // ... برای افزودن باکتری‌های بیشتر، این الگو را تکرار کنید
+        ];
+
+        
+        // ===============================================
+        //     بخش منطق برنامه و مدیریت DOM
+        // ===============================================
+
+        // --- انتخابگرهای DOM ---
+        const userModal = document.getElementById('user-modal');
+        const userForm = document.getElementById('user-form');
+        const usernameInput = document.getElementById('username-input');
+        const welcomeMessage = document.getElementById('welcome-message');
+        
+        const stainingTabsContainer = document.getElementById('staining-tabs');
+        const stainingStepsDisplay = document.getElementById('staining-steps-display');
+        
+        const searchInput = document.getElementById('search-input');
+        const morphologyGrid = document.getElementById('morphology-grid');
+        const searchHistoryContainer = document.getElementById('search-history');
+
+        const bacterium1Select = document.getElementById('bacterium1-select');
+        const bacterium2Select = document.getElementById('bacterium2-select');
+        const comparisonDisplay = document.getElementById('comparison-display');
+
+        // --- مدیریت کاربر ---
+        function checkUser() {
+            const username = localStorage.getItem('username');
+            if (!username) {
+                userModal.style.display = 'flex';
+            } else {
+                welcomeMessage.textContent = `${username} عزیز، خوش آمدید!`;
+            }
+        }
+
+        userForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = usernameInput.value.trim();
+            if (username) {
+                localStorage.setItem('username', username);
+                userModal.style.display = 'none';
+                welcomeMessage.textContent = `${username} عزیز، خوش آمدید!`;
+            }
+        });
+
+        // --- مدیریت تاریخچه جستجو ---
+        let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
+        function saveAndRenderHistory(term) {
+            if (!term) return;
+            // جلوگیری از افزودن موارد تکراری
+            searchHistory = searchHistory.filter(item => item !== term);
+            searchHistory.unshift(term); // افزودن به ابتدای آرایه
+            if (searchHistory.length > 10) {
+                searchHistory.pop(); // محدود کردن به ۱۰ آیتم
+            }
+            localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+            renderSearchHistory();
+        }
+
+        function renderSearchHistory() {
+            searchHistoryContainer.innerHTML = '';
+            if (searchHistory.length === 0) {
+                searchHistoryContainer.innerHTML = '<small>جستجویی ثبت نشده است.</small>';
+                return;
+            }
+            searchHistory.forEach(term => {
+                const termEl = document.createElement('span');
+                termEl.textContent = term;
+                termEl.addEventListener('click', () => {
+                    searchInput.value = term;
+                    filterBacteria();
+                });
+                searchHistoryContainer.appendChild(termEl);
+            });
+        }
+
+        // --- منطق بخش رنگ‌آمیزی ---
+        stainingTabsContainer.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const stainType = e.target.dataset.stain;
+                const data = STAINING_DATA[stainType];
+                if (data) {
+                    renderStainingSteps(data);
+                }
+            }
+        });
+
+        function renderStainingSteps(data) {
+            let tableHTML = `<h3>${data.title}</h3>
+                <table class="staining-table">
+                    <thead>
+                        <tr>
+                            <th>مرحله</th>
+                            <th>اقدام</th>
+                            <th>مدت زمان</th>
+                            <th>نکات</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            data.steps.forEach(step => {
+                tableHTML += `<tr>
+                                <td>${step.step}</td>
+                                <td>${step.action}</td>
+                                <td>${step.duration}</td>
+                                <td>${step.note}</td>
+                              </tr>`;
+            });
+            tableHTML += '</tbody></table>';
+            stainingStepsDisplay.innerHTML = tableHTML;
+        }
+
+        // --- منطق بانک مورفولوژی ---
+        function renderMorphologyGrid(bacteriaList) {
+            morphologyGrid.innerHTML = '';
+            if(bacteriaList.length === 0){
+                morphologyGrid.innerHTML = '<p>موردی یافت نشد.</p>';
+                return;
+            }
+            bacteriaList.forEach(bacterium => {
+                const card = document.createElement('div');
+                card.className = 'bacterium-card glass-panel';
+                card.innerHTML = `
+                    <img src="${bacterium.image}" alt="${bacterium.name}">
+                    <div class="bacterium-card-content">
+                        <h3>${bacterium.name}</h3>
+                        <p><strong>نوع رنگ‌آمیزی:</strong> ${bacterium.gram}</p>
+                        <p><strong>شکل ظاهری:</strong> ${bacterium.morphology}</p>
+                        <p><small>${bacterium.details}</small></p>
+                    </div>
+                `;
+                morphologyGrid.appendChild(card);
+            });
+        }
+        
+        function filterBacteria() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const filtered = BACTERIA_ATLAS.filter(b => 
+                b.name.toLowerCase().includes(searchTerm) ||
+                b.gram.toLowerCase().includes(searchTerm) ||
+                b.morphology.toLowerCase().includes(searchTerm)
+            );
+            renderMorphologyGrid(filtered);
+        }
+
+        searchInput.addEventListener('input', filterBacteria);
+        searchInput.addEventListener('change', () => saveAndRenderHistory(searchInput.value.trim()));
+
+        // --- منطق ابزار مقایسه ---
+        function populateComparisonDropdowns() {
+            const defaultOption = '<option value="">انتخاب کنید...</option>';
+            bacterium1Select.innerHTML = defaultOption;
+            bacterium2Select.innerHTML = defaultOption;
+
+            BACTERIA_ATLAS.forEach((bacterium, index) => {
+                const option = `<option value="${index}">${bacterium.name}</option>`;
+                bacterium1Select.innerHTML += option;
+                bacterium2Select.innerHTML += option;
+            });
+        }
+        
+        function renderComparison() {
+            const index1 = bacterium1Select.value;
+            const index2 = bacterium2Select.value;
+            
+            if (index1 === "" || index2 === "") {
+                comparisonDisplay.innerHTML = "<p>دو باکتری را برای مقایسه انتخاب کنید.</p>";
+                return;
+            }
+
+            const b1 = BACTERIA_ATLAS[index1];
+            const b2 = BACTERIA_ATLAS[index2];
+
+            comparisonDisplay.innerHTML = `
+                <table class="staining-table" id="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>ویژگی</th>
+                            <th>${b1.name}</th>
+                            <th>${b2.name}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>تصویر</strong></td>
+                            <td><img src="${b1.image}" alt="${b1.name}" style="width:100%; max-width:150px; border-radius: 4px;"></td>
+                            <td><img src="${b2.image}" alt="${b2.name}" style="width:100%; max-width:150px; border-radius: 4px;"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>رنگ‌آمیزی گرم</strong></td>
+                            <td>${b1.gram}</td>
+                            <td>${b2.gram}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>مورفولوژی</strong></td>
+                            <td>${b1.morphology}</td>
+                            <td>${b2.morphology}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>جزئیات</strong></td>
+                            <td>${b1.details}</td>
+                            <td>${b2.details}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        bacterium1Select.addEventListener('change', renderComparison);
+        bacterium2Select.addEventListener('change', renderComparison);
+        
+        // --- توابع اولیه برای بارگذاری برنامه ---
+        function initApp() {
+            checkUser();
+            renderMorphologyGrid(BACTERIA_ATLAS); // نمایش همه در ابتدا
+            renderSearchHistory();
+            populateComparisonDropdowns();
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+        }
+
+        // اجرای برنامه
+        initApp();
+    });
+    </script>
+
+</body>
+</html>
