@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ارائه: محاسبه سینوس و کسینوس با C</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2/Vazirmatn:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-color: #05050a;
+            --text-color: #e0e0e0;
+            --glass-bg: rgba(15, 15, 25, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --neon-primary: #00ffff;
+            --neon-secondary: #a800ff;
+            --title-color: #ffffff;
+            --highlight-color: #14ff8c;
+            --code-bg: rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: grid;
+            place-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(150px); opacity: 0.4; }
+        .blob1 { width: 400px; height: 400px; top: -10%; left: -15%; background-color: var(--neon-primary); animation: move 20s infinite alternate; }
+        .blob2 { width: 350px; height: 350px; bottom: -15%; right: -10%; background-color: var(--neon-secondary); animation: move 25s infinite alternate-reverse; }
+        @keyframes move { from { transform: translate(0, 0) scale(1); } to { transform: translate(100px, 50px) scale(1.2); } }
+
+        .presentation-container {
+            width: 90%; max-width: 950px; height: 85vh; max-height: 650px;
+            position: relative;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        .slides { width: 100%; height: 100%; position: relative; }
+        .slide {
+            padding: 40px 60px; width: 100%; height: 100%;
+            position: absolute; opacity: 0; visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            transform: scale(0.98);
+        }
+        .slide.active { opacity: 1; visibility: visible; transform: scale(1); }
+        .slide h1 { font-size: 3rem; font-weight: 900; color: var(--title-color); text-shadow: 0 0 20px var(--neon-primary); margin-bottom: 20px; animation: fadeIn 1s both; }
+        .slide h2 { font-size: 2rem; color: var(--title-color); margin-bottom: 25px; animation: fadeIn 1s 0.2s both; }
+        .slide p { font-size: 1.2rem; line-height: 1.9; max-width: 90%; animation: fadeIn 1s 0.4s both; }
+        .slide .subtitle { font-size: 1.3rem; opacity: 0.8; margin-top: 15px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .two-column-layout { display: flex; width: 100%; align-items: center; gap: 30px; }
+        .two-column-layout .code-side { flex: 1; }
+        .two-column-layout .explanation-side { flex: 1; text-align: right; }
+        .explanation-side p { font-size: 1.1rem !important; }
+
+        pre { background: var(--code-bg); border-radius: 10px; padding: 20px; text-align: left; direction: ltr; border: 1px solid var(--glass-border); overflow-x: auto; font-size: 1.1rem; }
+        code { font-family: 'Consolas', 'Courier New', monospace; }
+        .c-preprocessor { color: #9c9c9c; } .c-keyword { color: #569cd6; } .c-type { color: #4ec9b0; } .c-function { color: #dcdcaa; }
+        .c-string { color: #ce9178; } .c-number { color: #b5cea8; } .c-comment { color: #6a9955; }
+        
+        .full-code-box {
+            width: 90%; height: 75%; background: var(--code-bg); border-radius: 15px; border: 1px solid var(--glass-border);
+            padding: 20px;
+        }
+        .full-code-box textarea {
+            width: 100%; height: 100%; background: none; border: none; color: var(--text-color);
+            font-family: 'Consolas', 'Courier New', monospace; font-size: 1rem; resize: none;
+        }
+        /* --- استایل اسکرول بار --- */
+        textarea::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb { background: var(--neon-primary); border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb:hover { background: #00c4c4; }
+
+        .nav-buttons {
+            position: absolute; bottom: 30px; width: 100%;
+            padding: 0 40px; display: flex; justify-content: space-between;
+        }
+        .nav-btn {
+            background: transparent; color: var(--text-color);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px; padding: 10px 30px; font-family: 'Vazirmatn', sans-serif;
+            font-size: 1rem; cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 0 0px var(--neon-primary);
+        }
+        .nav-btn:not(:disabled):hover {
+            border-color: var(--neon-primary);
+            color: var(--neon-primary);
+            box-shadow: 0 0 10px var(--neon-primary), inset 0 0 10px var(--neon-primary);
+            transform: translateY(-2px);
+        }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        #back-to-site { position: absolute; top: 30px; left: 30px; text-decoration: none; z-index: 10; }
+        .footer-brand { position: absolute; bottom: 30px; left: 30px; font-size: 0.9rem; opacity: 0.6; }
+        .final-info { font-size: 1rem; line-height: 2; }
+        .disclaimer { font-size: 0.8rem; opacity: 0.6; margin-top: 20px; max-width: 70%;}
+    </style>
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+    </div>
+
+    <a href="dianakarimi.html" id="back-to-site" class="nav-btn">بریم سایت</a>
+    
+    <div class="presentation-container">
+        <div class="slides">
+            <section class="slide active">
+                <h1>ورود شما را به ارائه سرکار خانم دیانا کریمی تبریک میگوییم.</h1>
+                <p class="subtitle" style="color:var(--highlight-color);">سرویس ارائه آنلاین هکتوریا</p>
+            </section>
+
+            <section class="slide">
+                <hr style="width: 50%; margin-bottom: 30px; border-color: var(--glass-border);">
+                <h1>به نام خالق زیبایی‌ها</h1>
+                <p class="subtitle">استاد: آقای دکتر جمالی</p>
+                <p class="subtitle">دانشجو: دیانا کریمی</p>
+                <p class="subtitle">درس: محاسبات عددی</p>
+                <hr style="width: 50%; margin-top: 30px; border-color: var(--glass-border);">
+            </section>
+
+            <section class="slide">
+                <h2>صورت مسئله (نسخه تعاملی)</h2>
+                <p>
+                    برنامه‌ای به زبان C بنویسید که مقادیر صورت و مخرج را برای توابع <strong>sin</strong> و <strong>cos</strong> و همچنین توان دقت را از کاربر دریافت کرده و سپس نتیجه را با دقت خواسته شده محاسبه و چاپ کند.
+                </p>
+            </section>
+            
+            <section class="slide">
+                <h2>شروع کد: فراخوانی کتابخانه‌ها</h2>
+                <div class="two-column-layout">
+                    <div class="code-side">
+                        <pre><code><span class="c-preprocessor">#include &lt;stdio.h&gt;</span>
+<span class="c-preprocessor">#include &lt;math.h&gt;</span>
+<span class="c-preprocessor">#include &lt;stdlib.h&gt;</span></code></pre>
+                    </div>
+                    <div class="explanation-side">
+                        <p><strong>stdio.h:</strong> جعبه ابزار استاندارد برای ورودی و خروجی (مثل خواندن از کیبورد و چاپ روی صفحه).</p>
+                        <p><strong>math.h:</strong> جعبه ابزار توابع ریاضی پیشرفته مانند `sin`, `cos` و `fabs`.</p>
+                        <p><strong>stdlib.h:</strong> شامل توابع عمومی مانند `abs` برای قدر مطلق گرفتن از اعداد صحیح.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="slide">
+                <h2>تابع اصلی: نقطه شروع برنامه</h2>
+                 <div class="two-column-layout">
+                    <div class="code-side"><pre><code><span class="c-keyword">int</span> <span class="c-function">main</span>() {
+    <span class="c-comment">// ... کدها اینجا قرار میگیرند ...</span>
+}</code></pre></div>
+                    <div class="explanation-side">
+                        <p>تمام برنامه‌های C از تابعی به نام `main` شروع می‌شوند. این تابع مثل دروازه ورودی شهر است و اجرای برنامه از اولین خط داخل آن آغاز می‌شود.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="slide">
+                <h2>تعریف متغیرها: ساختن ظرف‌های خالی</h2>
+                 <div class="two-column-layout">
+                    <div class="code-side"><pre><code><span class="c-type">double</span> sin_up, sin_down;
+<span class="c-type">double</span> cos_up, cos_down;
+<span class="c-type">int</span> exponent;
+<span class="c-type">int</span> precision;</code></pre></div>
+                    <div class="explanation-side">
+                        <p>در این بخش، متغیرهایی (ظرف‌هایی برای نگهداری داده) تعریف می‌کنیم:</p>
+                        <p><strong>double:</strong> برای ذخیره اعداد اعشاری با دقت بالا (صورت و مخرج).</p>
+                        <p><strong>int:</strong> برای ذخیره اعداد صحیح (توان دقت).</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="slide">
+                <h2>دریافت ورودی سینوس</h2>
+                 <div class="two-column-layout">
+                    <div class="code-side"><pre><code><span class="c-function">printf</span>(<span class="c-string">"sin():\n"</span>);
+<span class="c-function">printf</span>(<span class="c-string">"up: "</span>);
+<span class="c-function">scanf</span>(<span class="c-string">"%lf"</span>, &sin_up);
+<span class="c-function">printf</span>(<span class="c-string">"down: "</span>);
+<span class="c-function">scanf</span>(<span class="c-string">"%lf"</span>, &sin_down);</code></pre></div>
+                    <div class="explanation-side">
+                        <p><strong>printf:</strong> پیامی را روی صفحه چاپ می‌کند تا کاربر بداند چه چیزی را باید وارد کند.</p>
+                        <p><strong>scanf:</strong> منتظر می‌ماند تا کاربر عددی را تایپ کرده و Enter را بزند. سپس آن عدد را در متغیر مربوطه ذخیره می‌کند. (`&` به `scanf` آدرس دقیق متغیر را می‌دهد).</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="slide">
+                <h2>دریافت ورودی کسینوس</h2>
+                 <div class="two-column-layout">
+                    <div class="code-side"><pre><code><span class="c-function">printf</span>(<span class="c-string">"cos():\n"</span>);
+<span class="c-function">printf</span>(<span class="c-string">"up: "</span>);
+<span class="c-function">scanf</span>(<span class="c-string">"%lf"</span>, &cos_up);
+<span class="c-function">printf</span>(<span class="c-string">"down: "</span>);
+<span class="c-function">scanf</span>(<span class="c-string">"%lf"</span>, &cos_down);</code></pre></div>
+                    <div class="explanation-side">
+                        <p>این بخش کاملاً مشابه مرحله قبل است، اما این بار مقادیر صورت و مخرج را برای تابع کسینوس از کاربر دریافت می‌کنیم و در متغیرهای `cos_up` و `cos_down` ذخیره می‌نماییم.</p>
+                    </div>
+                </div>
+            </section>
+            
+             <section class="slide">
+                <h2>دریافت توان دقت</h2>
+                 <div class="two-column-layout">
+                    <div class="code-side"><pre><code><span class="c-function">printf</span>(<span class="c-string">"10 up to (): "</span>);
+<span class="c-function">scanf</span>(<span class="c-string">"%d"</span>, &exponent);</code></pre></div>
+                    <div class="explanation-side">
+                        <p>در اینجا، از کاربر می‌خواهیم توان دقت مورد نظر را وارد کند (مثلاً 8-).</p>
+                        <p>از فرمت `"%d"` در `scanf` استفاده می‌کنیم، چون `exponent` یک متغیر از نوع عدد صحیح (`int`) است.</p>
+                    </div>
+                </div>
+            </section>
+
+             <section class="slide">
+                <h2>پردازش و محاسبه</h2>
+                 <div class="two-column-layout">
+                    <div class="code-side"><pre><code><span class="c-type">double</span> sin_angle = sin_up / sin_down;
+<span class="c-type">double</span> cos_angle = cos_up / cos_down;
+
+<span class="c-type">double</span> sin_val = <span class="c-function">sin</span>(sin_angle);
+<span class="c-type">double</span> cos_val = <span class="c-function">cos</span>(cos_angle);
+
+precision = <span class="c-function">abs</span>(exponent);</code></pre></div>
+                    <div class="explanation-side">
+                        <p>۱. ابتدا صورت را بر مخرج تقسیم کرده تا زاویه نهایی را به دست آوریم.</p>
+                        <p>۲. سپس مقادیر سینوس و کسینوس این زوایا را با توابع آماده محاسبه می‌کنیم.</p>
+                        <p>۳. چون دقت چاپ باید یک عدد مثبت باشد، با `abs` قدر مطلق توان ورودی را محاسبه می‌کنیم.</p>
+                    </div>
+                </div>
+            </section>
+
+             <section class="slide">
+                <h2>چاپ نتیجه نهایی</h2>
+                 <div class="two-column-layout">
+                    <div class="code-side"><pre><code><span class="c-function">printf</span>(<span class="c-string">"\n--- Results ---\n"</span>);
+<span class="c-function">printf</span>(<span class="c-string">"sin(%.2f/%.2f) = %.*f\n"</span>,
+        sin_up, sin_down, precision, sin_val);
+
+<span class="c-function">printf</span>(<span class="c-string">"cos(%.2f/%.2f) = %.*f\n"</span>,
+        cos_up, cos_down, precision, cos_val);</code></pre></div>
+                    <div class="explanation-side">
+                        <p>در `printf` نهایی از یک ترفند جالب استفاده می‌کنیم:</p>
+                        <p>فرمت `%.*f` به `printf` می‌گوید: "تعداد ارقام اعشار را از یک متغیر جداگانه بخوان". ما متغیر `precision` را به آن می‌دهیم تا نتیجه دقیقاً با دقتی که کاربر خواسته چاپ شود.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="slide">
+                <h2>کد کامل برنامه</h2>
+                <p style="margin-bottom: 20px;">کد زیر را می‌توانید برای اجرا کپی کنید.</p>
+                <div class="full-code-box">
+                    <textarea readonly>
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h> // For abs()
+
+int main() {
+    // Variable declarations
+    double sin_up, sin_down;
+    double cos_up, cos_down;
+    int exponent;
+    int precision;
+
+    // --- Get sin input ---
+    printf("sin():\n");
+    printf("up: ");
+    scanf("%lf", &sin_up);
+    printf("down: ");
+    scanf("%lf", &sin_down);
+    printf("sin(%.2f/%.2f) ok!\n\n", sin_up, sin_down);
+
+    // --- Get cos input ---
+    printf("cos():\n");
+    printf("up: ");
+    scanf("%lf", &cos_up);
+    printf("down: ");
+    scanf("%lf", &cos_down);
+    printf("cos(%.2f/%.2f) ok!\n\n", cos_up, cos_down);
+
+    // --- Get precision exponent ---
+    printf("10 up to (): ");
+    scanf("%d", &exponent);
+    printf("10 up to (%d) ok!\n", exponent);
+
+    // --- Calculations ---
+    // Check for division by zero to avoid errors
+    if (sin_down == 0 || cos_down == 0) {
+        printf("\nError: Division by zero is not allowed.\n");
+        return 1; // Exit with an error code
+    }
+
+    double sin_angle = sin_up / sin_down;
+    double cos_angle = cos_up / cos_down;
+
+    double sin_val = sin(sin_angle);
+    double cos_val = cos(cos_angle);
+
+    // Precision must be a positive integer for printf
+    precision = abs(exponent);
+
+    // --- Print results ---
+    printf("\n--- Results ---\n");
+    // Using ".*" in printf to specify precision dynamically
+    printf("sin(%.2f/%.2f) = %.*f\n", sin_up, sin_down, precision, sin_val);
+    printf("cos(%.2f/%.2f) = %.*f\n", cos_up, cos_down, precision, cos_val);
+
+    return 0; // Successful execution
+}
+                    </textarea>
+                </div>
+            </section>
+
+            <section class="slide">
+                <h1>پایان</h1>
+                <div class="final-info">
+                    <p><strong>تهیه کننده: دیانا کریمی</strong></p>
+                    <p style="color:var(--highlight-color); margin-top: 20px;">سرویس ارائه آنلاین هکتوریا رایگان ویژه دانشجویان واحد کازرون</p>
+                    <p class="disclaimer">(توجه: هکتوریا فقط میزبان فایل‌های ارائه می‌باشد و در تولید یا تغییر ارائه دخل و تصرفی ندارد).</p>
+                    <p style="font-size: 0.9rem; margin-top: 15px;">تماس با مدیر سایت: 09227931379 (آقای رستمی)</p>
+                    <p style="font-size: 0.9rem; margin-top: 15px;">  دانشجوی مهندسی کامپیوتر در دانشگاه آزاد اسلامی واحد کازرون</p>
+                </div>
+            </section>
+        </div>
+        
+        <div class="nav-buttons">
+            <button id="prev-btn" class="nav-btn">قبلی</button>
+            <button id="next-btn" class="nav-btn">بعدی / شروع</button>
+        </div>
+    </div>
+    <p class="footer-brand">قدرت گرفته از هکتوریا</p><a href="index.html" class="footer-brand">قدرت گرفته از هکتوریا</a>
+    
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === slides.length - 1;
+
+            if (index === 0) {
+                prevBtn.style.opacity = '0';
+                nextBtn.textContent = 'شروع';
+            } else {
+                prevBtn.style.opacity = '1';
+                nextBtn.textContent = 'بعدی';
+            }
+             if (index === slides.length - 1) {
+                nextBtn.style.opacity = '0';
+            } else {
+                nextBtn.style.opacity = '1';
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        });
+
+        showSlide(currentSlide);
+        
+    </script>
+    <script>
+    // --- قفل کردن کلیک راست ---
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        alert("کلیک راست در این سایت غیرفعال است.");
+    });
+
+    // --- قفل کردن کلیدهای ترکیبی برای جلوگیری از دسترسی به سورس و ابزارهای توسعه ---
+    document.addEventListener('keydown', function(e) {
+        // جلوگیری از F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+        }
+        
+        // جلوگیری از Ctrl+Shift+I (Inspect)
+        if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+            e.preventDefault();
+        }
+
+        // جلوگیری از Ctrl+Shift+J (Console)
+        if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+            e.preventDefault();
+        }
+
+        // جلوگیری از Ctrl+U (View Source)
+        if (e.ctrlKey && e.key === 'U') {
+            e.preventDefault();
+        }
+
+        // جلوگیری از Ctrl+S (Save Page)
+        if (e.ctrlKey && e.key === 'S') {
+            e.preventDefault();
+        }
+
+        // جلوگیری از Ctrl+C (Copy)
+        if (e.ctrlKey && e.key === 'C') {
+            e.preventDefault();
+        }
+        
+        // جلوگیری از Ctrl+P (Print)
+        if (e.ctrlKey && e.key === 'P') {
+            e.preventDefault();
+        }
+    });
+
+    // --- جلوگیری از کپی کردن محتوا ---
+    document.addEventListener('copy', function(e) {
+        e.preventDefault();
+        alert("کپی کردن محتوای این سایت مجاز نیست.");
+    });
+    
+    // --- جلوگیری از انتخاب متن (با CSS) ---
+    // این کد CSS را به فایل استایل خود اضافه کنید
+    /*
+    body {
+        -webkit-user-select: none; // Safari
+        -ms-user-select: none; // IE 10+
+        user-select: none; // Standard syntax
+    }
+    */
+    // یا می‌توانید با جاوا اسکریپت به body اضافه کنید:
+    document.body.style.userSelect = "none";
+    document.body.style.webkitUserSelect = "none";
+    document.body.style.msUserSelect = "none";
+
+
+    // --- ترفندی برای مختل کردن کارکرد Developer Tools ---
+    // این تابع به صورت مداوم دستور debugger را فراخوانی می‌کند.
+    // اگر پنل توسعه‌دهنده باز باشد، اجرای کد متوقف شده و کار با آن بسیار دشوار می‌شود.
+    setInterval(function() {
+        debugger;
+    }, 500);
+
+</script>
+</body>
+</html>

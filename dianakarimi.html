@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ماشین حساب مهندسی</title>
+    <style>
+        /* --- تنظیمات اولیه و فونت --- */
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+
+        :root {
+            /* متغیرهای رنگی برای تم تاریک (پیش‌فرض) */
+            --bg-color: #0a0a0a;
+            --text-color: #e0e0e0;
+            --glass-bg: rgba(25, 25, 25, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --neon-primary: #00ffff; /* آبی یخی */
+            --neon-secondary: #a800ff; /* بنفش نئونی */
+            --btn-calculate-bg: rgba(255, 20, 20, 0.7);
+            --btn-calculate-neon: #ff1414;
+            --btn-calculated-bg: rgba(20, 255, 140, 0.7);
+            --btn-calculated-neon: #14ff8c;
+            --selected-input-bg: rgba(0, 255, 255, 0.2);
+            --keyboard-btn-bg: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* ... (کد تم روشن بدون تغییر باقی می‌ماند) ... */
+        body.light-theme {
+            --bg-color: #f0f2f5;
+            --text-color: #1a1a1a;
+            --glass-bg: rgba(255, 255, 255, 0.5);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --neon-primary: #00aaff;
+            --neon-secondary: #ffaa00;
+            --selected-input-bg: rgba(0, 170, 255, 0.2);
+            --keyboard-btn-bg: rgba(0, 0, 0, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: grid;
+            place-items: center;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.5s ease;
+            position: relative;
+        }
+
+        /* --- حباب‌های نئونی متحرک --- */
+        .blob {
+            position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.6; z-index: -1;
+        }
+        .blob1 { width: 350px; height: 350px; top: -50px; left: -100px; background-color: var(--neon-primary); animation: move 20s infinite alternate; }
+        .blob2 { width: 300px; height: 300px; bottom: -80px; right: -120px; background-color: var(--neon-secondary); animation: move 25s infinite alternate-reverse; }
+        @keyframes move { from { transform: translate(0, 0) scale(1); } to { transform: translate(100px, 50px) scale(1.2); } }
+        
+        /* --- استایل کارت اصلی و انیمیشن آن --- */
+        .glass-card {
+            width: 90%; max-width: 450px; background: var(--glass-bg); backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 20px;
+            padding: 25px; text-align: center; z-index: 2; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* انیمیشن نرم برای حرکت */
+        }
+        
+        /* وقتی کیبورد فعال است، کارت اصلی به چپ حرکت می‌کند */
+        body.keyboard-active .glass-card {
+            transform: translateX(-180px);
+        }
+
+        /* --- ورودی‌های قابل کلیک --- */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .input-button {
+            background-color: var(--keyboard-btn-bg);
+            border: 1px solid transparent;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            color: var(--text-color);
+            direction: ltr; /* برای نمایش صحیح فرمول */
+        }
+        .input-button:hover {
+            border-color: var(--neon-primary);
+        }
+        .input-button.selected {
+            background-color: var(--selected-input-bg);
+            border-color: var(--neon-primary);
+            box-shadow: 0 0 10px var(--neon-primary);
+        }
+        .input-button .label {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        .precision-input {
+            width: 50px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* --- نمایشگر نتایج --- */
+        .results-display { background: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 20px; margin-bottom: 20px; font-size: 1.1rem; min-height: 80px; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+        
+        /* --- دکمه محاسبه --- */
+        #calculate-btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-family: 'Vazirmatn', sans-serif; font-size: 1.2rem; font-weight: bold; cursor: pointer; color: white; background-color: var(--btn-calculate-bg); box-shadow: 0 0 5px var(--btn-calculate-neon), 0 0 15px var(--btn-calculate-neon), 0 0 25px var(--btn-calculate-neon); transition: all 0.4s ease; }
+        #calculate-btn.calculated { background-color: var(--btn-calculated-bg); box-shadow: 0 0 8px var(--btn-calculated-neon), 0 0 20px var(--btn-calculated-neon), 0 0 35px var(--btn-calculated-neon); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 8px var(--btn-calculated-neon), 0 0 20px var(--btn-calculated-neon); } 50% { box-shadow: 0 0 12px var(--btn-calculated-neon), 0 0 30px var(--btn-calculated-neon); } }
+
+        /* --- کیبورد مجازی --- */
+        .virtual-keyboard {
+            position: fixed;
+            right: -100%; /* در ابتدا خارج از صفحه */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 320px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            z-index: 10;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+            transition: right 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* انیمیشن نرم */
+        }
+        body.keyboard-active .virtual-keyboard {
+            right: 20px; /* با فعال شدن به داخل صفحه می‌آید */
+        }
+        .keyboard-header { display: flex; justify-content: space-between; align-items: center; color: var(--text-color); margin-bottom: 15px; }
+        #close-keyboard { cursor: pointer; font-size: 1.5rem; }
+        .keyboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .keyboard-grid button {
+            background: var(--keyboard-btn-bg);
+            border: 1px solid transparent;
+            color: var(--text-color);
+            border-radius: 10px;
+            height: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .keyboard-grid button:hover { background-color: var(--selected-input-bg); border-color: var(--neon-primary); }
+        .keyboard-grid button.op { color: var(--neon-primary); }
+
+        /* --- فوتر و دکمه‌های کناری --- */
+        footer { margin-top: 15px; font-size: 0.8rem; line-height: 1.6; opacity: 0.8; }
+        .side-btn { position: fixed; top: 20px; background: var(--glass-bg); color: var(--text-color); border: 1px solid var(--glass-border); border-radius: 12px; height: 45px; display: flex; align-items: center; padding: 0 15px; gap: 10px; cursor: pointer; text-decoration: none; font-size: 1rem; backdrop-filter: blur(10px); transition: all 0.3s ease; z-index: 5; }
+        .side-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon-primary); }
+        #code-link-btn { left: 20px; }
+        #theme-toggle { right: 20px; }
+        body.keyboard-active #theme-toggle { right: 360px; } /* دکمه تم هم با کیبورد حرکت می‌کند */
+
+    </style>
+</head>
+<body>
+    
+    <a href="present.html" id="code-link-btn" class="side-btn">
+        <span>📂</span> مشاهده کد به زبان سی
+    </a>
+    <div id="theme-toggle" class="side-btn">🎨</div>
+    
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+
+    <main class="glass-card">
+        <div class="input-group">
+            <div id="sin-input-btn" class="input-button" data-type="sin">sin( <span class="value">π/5</span> )</div>
+            <div id="cos-input-btn" class="input-button" data-type="cos">cos( <span class="value">π/5</span> )</div>
+            <div id="precision-input-btn" class="input-button" data-type="precision">
+                <span class="label">دقت (توان 10):</span> <input type="number" class="precision-input" id="precision-input-field" value="-8">
+            </div>
+        </div>
+        
+        <div class="results-display" id="results-container">
+            <p>مقادیر ورودی را انتخاب و محاسبه کنید.</p>
+        </div>
+
+        <button id="calculate-btn">محاسبه</button>
+
+        <footer>
+            <p>تهیه کننده: دیانا کریمی</p>
+            <p>دانشگاه آزاد اسلامی واحد کازرون</p>
+            <p>استاد: آقای دکتر جمالی</p>
+        </footer>
+    </main>
+
+    <aside class="virtual-keyboard" id="virtual-keyboard">
+        <div class="keyboard-header">
+            <span id="keyboard-title">ویرایش ورودی</span>
+            <span id="close-keyboard">&times;</span>
+        </div>
+        <div class="keyboard-grid">
+            <button data-key="7">7</button> <button data-key="8">8</button> <button data-key="9">9</button> <button data-key="π" class="op">π</button>
+            <button data-key="4">4</button> <button data-key="5">5</button> <button data-key="6">6</button> <button data-key="/" class="op">/</button>
+            <button data-key="1">1</button> <button data-key="2">2</button> <button data-key="3">3</button> <button data-key="*" class="op">*</button>
+            <button data-key="0">0</button> <button data-key=".">.</button> <button data-key="⌫" class="op">⌫</button> <button data-key="-" class="op">-</button>
+        </div>
+    </aside>
+
+    <script>
+        // --- State Management ---
+        let activeInput = null; // 'sin' or 'cos'
+        let expressions = {
+            sin: 'π/5',
+            cos: 'π/5'
+        };
+
+        // --- DOM Elements ---
+        const body = document.body;
+        const sinInputBtn = document.getElementById('sin-input-btn');
+        const cosInputBtn = document.getElementById('cos-input-btn');
+        const precisionInputField = document.getElementById('precision-input-field');
+        const resultsContainer = document.getElementById('results-container');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const virtualKeyboard = document.getElementById('virtual-keyboard');
+        const closeKeyboardBtn = document.getElementById('close-keyboard');
+        const keyboardGrid = document.querySelector('.keyboard-grid');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        // --- Functions ---
+        function updateDisplay() {
+            sinInputBtn.querySelector('.value').textContent = expressions.sin;
+            cosInputBtn.querySelector('.value').textContent = expressions.cos;
+        }
+
+        function openKeyboard(type) {
+            activeInput = type;
+            body.classList.add('keyboard-active');
+            sinInputBtn.classList.remove('selected');
+            cosInputBtn.classList.remove('selected');
+            if (type === 'sin') sinInputBtn.classList.add('selected');
+            if (type === 'cos') cosInputBtn.classList.add('selected');
+        }
+
+        function closeKeyboard() {
+            activeInput = null;
+            body.classList.remove('keyboard-active');
+            sinInputBtn.classList.remove('selected');
+            cosInputBtn.classList.remove('selected');
+        }
+
+        function safeEval(expressionStr) {
+            try {
+                // Replace π with its numeric value for calculation
+                const sanitizedStr = expressionStr.replace(/π/g, 'Math.PI');
+                // Use the Function constructor for safer evaluation than eval()
+                return new Function('return ' + sanitizedStr)();
+            } catch (error) {
+                return 'خطا';
+            }
+        }
+        
+        // --- Event Listeners ---
+        sinInputBtn.addEventListener('click', () => openKeyboard('sin'));
+        cosInputBtn.addEventListener('click', () => openKeyboard('cos'));
+        closeKeyboardBtn.addEventListener('click', closeKeyboard);
+
+        keyboardGrid.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON' || !activeInput) return;
+
+            const key = e.target.dataset.key;
+
+            if (key === '⌫') { // Backspace
+                expressions[activeInput] = expressions[activeInput].slice(0, -1);
+            } else {
+                expressions[activeInput] += key;
+            }
+            updateDisplay();
+        });
+        
+        // Prevent keyboard from opening for precision input
+        precisionInputField.addEventListener('focus', (e) => {
+            e.target.blur(); // Remove focus to avoid system keyboard
+            closeKeyboard();
+            document.getElementById('precision-input-btn').classList.add('selected');
+        });
+        precisionInputField.addEventListener('blur', () => {
+             document.getElementById('precision-input-btn').classList.remove('selected');
+        });
+
+
+        calculateBtn.addEventListener('click', () => {
+            closeKeyboard();
+            const sinValue = safeEval(expressions.sin);
+            const cosValue = safeEval(expressions.cos);
+            
+            // Precision is the absolute value of the input
+            const precision = Math.abs(parseInt(precisionInputField.value, 10)) || 8;
+
+            resultsContainer.innerHTML = ''; // Clear previous results
+
+            if (sinValue !== 'خطا' && cosValue !== 'خطا') {
+                const finalSin = Math.sin(sinValue);
+                const finalCos = Math.cos(cosValue);
+
+                resultsContainer.innerHTML = `
+                    <div style="direction: ltr;"><strong>sin(${expressions.sin}) ≈</strong> ${finalSin.toFixed(precision)}</div>
+                    <div style="direction: ltr;"><strong>cos(${expressions.cos}) ≈</strong> ${finalCos.toFixed(precision)}</div>
+                `;
+                calculateBtn.classList.add('calculated');
+                calculateBtn.textContent = 'محاسبه شد!';
+            } else {
+                resultsContainer.innerHTML = `<p style="color: #ff5555;">عبارت وارد شده نامعتبر است!</p>`;
+                calculateBtn.classList.remove('calculated');
+                calculateBtn.textContent = 'محاسبه';
+            }
+        });
+
+        themeToggle.addEventListener('click', () => body.classList.toggle('light-theme'));
+
+        // --- Initial Load ---
+        updateDisplay();
+    </script>
+    <script>
+    // --- قفل کردن کلیک راست ---
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        alert("کلیک راست در این سایت غیرفعال است.");
+    });
+
+    // --- قفل کردن کلیدهای ترکیبی برای جلوگیری از دسترسی به سورس و ابزارهای توسعه ---
+    document.addEventListener('keydown', function(e) {
+        // جلوگیری از F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+        }
+        
+        // جلوگیری از Ctrl+Shift+I (Inspect)
+        if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+            e.preventDefault();
+        }
+
+        // جلوگیری از Ctrl+Shift+J (Console)
+        if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+            e.preventDefault();
+        }
+
+        // جلوگیری از Ctrl+U (View Source)
+        if (e.ctrlKey && e.key === 'U') {
+            e.preventDefault();
+        }
+
+        // جلوگیری از Ctrl+S (Save Page)
+        if (e.ctrlKey && e.key === 'S') {
+            e.preventDefault();
+        }
+
+        // جلوگیری از Ctrl+C (Copy)
+        if (e.ctrlKey && e.key === 'C') {
+            e.preventDefault();
+        }
+        
+        // جلوگیری از Ctrl+P (Print)
+        if (e.ctrlKey && e.key === 'P') {
+            e.preventDefault();
+        }
+    });
+
+    // --- جلوگیری از کپی کردن محتوا ---
+    document.addEventListener('copy', function(e) {
+        e.preventDefault();
+        alert("کپی کردن محتوای این سایت مجاز نیست.");
+    });
+    
+    // --- جلوگیری از انتخاب متن (با CSS) ---
+    // این کد CSS را به فایل استایل خود اضافه کنید
+    /*
+    body {
+        -webkit-user-select: none; // Safari
+        -ms-user-select: none; // IE 10+
+        user-select: none; // Standard syntax
+    }
+    */
+    // یا می‌توانید با جاوا اسکریپت به body اضافه کنید:
+    document.body.style.userSelect = "none";
+    document.body.style.webkitUserSelect = "none";
+    document.body.style.msUserSelect = "none";
+
+
+    // --- ترفندی برای مختل کردن کارکرد Developer Tools ---
+    // این تابع به صورت مداوم دستور debugger را فراخوانی می‌کند.
+    // اگر پنل توسعه‌دهنده باز باشد، اجرای کد متوقف شده و کار با آن بسیار دشوار می‌شود.
+    setInterval(function() {
+        debugger;
+    }, 500);
+
+</script>
+</body>
+</html>
