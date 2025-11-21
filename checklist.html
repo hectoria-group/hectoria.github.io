@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>چک‌لیست نئونی | هکتوریا</title>
+    
+    <!-- فونت وزیرمتن -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- آیکون‌ها -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --card-bg: rgba(30, 30, 35, 0.6);
+            --primary: #00f3ff; /* آبی نئونی */
+            --accent: #ff003c; /* قرمز نئونی */
+            --success: #00ff88; /* سبز نئونی */
+            --text: #ffffff;
+            --text-muted: #888888;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 60, 0.05) 0%, transparent 20%);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* جلوگیری از اسکرول کلی صفحه */
+        }
+
+        /* --- هدر --- */
+        header {
+            padding: 20px;
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .app-title {
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        .progress-container {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circular-chart {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #333;
+            stroke-width: 3.8;
+        }
+
+        .circle {
+            fill: none;
+            stroke-width: 2.8;
+            stroke-linecap: round;
+            stroke: var(--success);
+            transition: stroke-dasharray 0.5s ease;
+        }
+
+        .percentage {
+            position: absolute;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        /* --- لیست تسک‌ها (Main) --- */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 100px; /* فضای خالی برای دکمه شناور */
+        }
+
+        /* کاستوم اسکرول بار */
+        main::-webkit-scrollbar { width: 4px; }
+        main::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        .empty-state {
+            text-align: center;
+            margin-top: 50px;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .task-item {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .task-item.completed {
+            border-color: var(--success);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .task-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* چک باکس سفارشی نئونی */
+        .custom-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--text-muted);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .task-item.completed .custom-checkbox {
+            border-color: var(--success);
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .custom-checkbox i {
+            color: #000;
+            font-size: 12px;
+            display: none;
+        }
+
+        .task-item.completed .custom-checkbox i {
+            display: block;
+        }
+
+        .task-text {
+            font-size: 1rem;
+            transition: 0.3s;
+            word-break: break-word;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .delete-btn {
+            background: rgba(255, 0, 60, 0.1);
+            color: var(--accent);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .delete-btn:active {
+            transform: scale(0.9);
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* --- فوتر و کنترل‌ها --- */
+        .controls-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(to top, #09090b 80%, transparent);
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            z-index: 20;
+        }
+
+        .input-group {
+            flex: 1;
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 5px 5px 5px 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        #taskInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            padding: 10px 0;
+        }
+
+        #addBtn {
+            width: 45px;
+            height: 45px;
+            border-radius: 15px;
+            background: var(--primary);
+            color: #000;
+            border: none;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--primary);
+            transition: 0.3s;
+        }
+
+        #addBtn:active {
+            transform: scale(0.9);
+        }
+
+        .settings-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        /* --- مودال (Modal) --- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            width: 85%;
+            max-width: 400px;
+            background: #16161a;
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 25px;
+            position: relative;
+            text-align: center;
+            transform: translateY(20px);
+            transition: 0.3s;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal h3 {
+            margin-top: 0;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .modal-actions button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-actions button.save-btn {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .modal-actions button.load-btn {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* فایل اینپوت مخفی */
+        #fileInput { display: none; }
+
+    </style>
+</head>
+<body>
+
+    <!-- هدر -->
+    <header>
+        <div class="app-title">
+            TASK <span style="color:#fff">MASTER</span>
+            <i class="fas fa-bolt" style="font-size:0.8rem; margin-right:5px;"></i>
+        </div>
+        
+        <!-- نمودار دایره‌ای پیشرفت -->
+        <div class="progress-container">
+            <svg viewBox="0 0 36 36" class="circular-chart">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="circle" id="progressPath" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <span class="percentage" id="progressText">0%</span>
+        </div>
+    </header>
+
+    <!-- بدنه اصلی لیست -->
+    <main id="taskList">
+        <!-- لیست اینجا رندر میشود -->
+        <div class="empty-state">
+            <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 15px;"></i>
+            <p>لیست شما خالی است!<br>اولین ماموریت خود را وارد کنید.</p>
+        </div>
+    </main>
+
+    <!-- کنترل‌های پایین صفحه -->
+    <div class="controls-area">
+        <button class="settings-btn" onclick="toggleModal()">
+            <i class="fas fa-cog"></i>
+        </button>
+        
+        <div class="input-group">
+            <input type="text" id="taskInput" placeholder="ماموریت جدید..." autocomplete="off">
+            <button id="addBtn" onclick="addTask()">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- مودال تنظیمات و بکاپ -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <i class="fas fa-times close-modal" onclick="toggleModal()"></i>
+            <h3>تنظیمات داده‌ها</h3>
+            
+            <div class="modal-actions">
+                <button class="save-btn" onclick="exportData()">
+                    <i class="fas fa-download"></i> ذخیره فایل پشتیبان (Backup)
+                </button>
+                
+                <button class="load-btn" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-upload"></i> بازگردانی فایل (Restore)
+                </button>
+                <input type="file" id="fileInput" accept=".json" onchange="importData(this)">
+                
+                <button onclick="clearAllData()" style="border-color: var(--accent); color: var(--accent);">
+                    <i class="fas fa-trash-alt"></i> حذف تمام لیست
+                </button>
+            </div>
+            
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 20px;">
+                طراحی شده برای موبایل | نسخه 1.0
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // متغیرها
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        const taskListEl = document.getElementById('taskList');
+        const taskInput = document.getElementById('taskInput');
+        const progressPath = document.getElementById('progressPath');
+        const progressText = document.getElementById('progressText');
+
+        // راه‌اندازی اولیه
+        renderTasks();
+
+        // 1. افزودن تسک
+        function addTask() {
+            const text = taskInput.value.trim();
+            if (text === '') return;
+
+            const newTask = {
+                id: Date.now(),
+                text: text,
+                completed: false
+            };
+
+            tasks.push(newTask);
+            saveAndRender();
+            taskInput.value = '';
+            taskInput.focus();
+            
+            // اسکرول به پایین
+            setTimeout(() => {
+                taskListEl.scrollTop = taskListEl.scrollHeight;
+            }, 100);
+        }
+
+        // زدن اینتر برای افزودن
+        taskInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') addTask();
+        });
+
+        // 2. تغییر وضعیت (تیک زدن)
+        function toggleTask(id) {
+            tasks = tasks.map(task => {
+                if (task.id === id) {
+                    return { ...task, completed: !task.completed };
+                }
+                return task;
+            });
+            saveAndRender();
+        }
+
+        // 3. حذف تسک
+        function deleteTask(id) {
+            if(confirm('این آیتم حذف شود؟')) {
+                tasks = tasks.filter(task => task.id !== id);
+                saveAndRender();
+            }
+        }
+
+        // 4. حذف همه
+        function clearAllData() {
+            if(confirm('آیا مطمئن هستید؟ کل لیست پاک می‌شود!')) {
+                tasks = [];
+                saveAndRender();
+                toggleModal();
+            }
+        }
+
+        // 5. رندر کردن لیست در HTML
+        function renderTasks() {
+            if (tasks.length === 0) {
+                taskListEl.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-gamepad" style="font-size: 3rem; margin-bottom: 15px; color: var(--glass-border);"></i>
+                        <p>هیچ ماموریتی ندارید!<br>دکمه + را فشار دهید.</p>
+                    </div>`;
+                updateProgress();
+                return;
+            }
+
+            taskListEl.innerHTML = '';
+            
+            // مرتب سازی: انجام نشده‌ها بالا، انجام شده‌ها پایین
+            const sortedTasks = [...tasks].sort((a, b) => a.completed - b.completed);
+
+            sortedTasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = `task-item ${task.completed ? 'completed' : ''}`;
+                div.innerHTML = `
+                    <div class="task-content" onclick="toggleTask(${task.id})">
+                        <div class="custom-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span class="task-text">${task.text}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                taskListEl.appendChild(div);
+            });
+
+            updateProgress();
+        }
+
+        // 6. بروزرسانی نمودار پیشرفت
+        function updateProgress() {
+            if (tasks.length === 0) {
+                progressPath.setAttribute('stroke-dasharray', `0, 100`);
+                progressText.textContent = "0%";
+                return;
+            }
+
+            const completedCount = tasks.filter(t => t.completed).length;
+            const percentage = Math.round((completedCount / tasks.length) * 100);
+
+            progressPath.setAttribute('stroke-dasharray', `${percentage}, 100`);
+            progressText.textContent = `${percentage}%`;
+            
+            // تغییر رنگ بر اساس تکمیل
+            if(percentage === 100) {
+                progressText.style.color = 'var(--success)';
+            } else {
+                progressText.style.color = 'var(--text)';
+            }
+        }
+
+        // 7. ذخیره در LocalStorage
+        function saveAndRender() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        // --- مدیریت فایل (Backup & Restore) ---
+
+        // باز و بسته کردن مودال
+        function toggleModal() {
+            document.getElementById('settingsModal').classList.toggle('active');
+        }
+
+        // دانلود فایل جیسون (Export)
+        function exportData() {
+            if(tasks.length === 0) {
+                alert("لیست خالی است، چیزی برای ذخیره وجود ندارد.");
+                return;
+            }
+            
+            const dataStr = JSON.stringify(tasks);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'checklist-backup.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // آپلود فایل جیسون (Import)
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    const importedTasks = JSON.parse(content);
+                    
+                    if (Array.isArray(importedTasks)) {
+                        if(confirm(`آیا مطمئن هستید؟ ${importedTasks.length} آیتم جایگزین لیست فعلی می‌شود.`)) {
+                            tasks = importedTasks;
+                            saveAndRender();
+                            toggleModal();
+                            alert("بکاپ با موفقیت بازگردانی شد!");
+                        }
+                    } else {
+                        alert("فرمت فایل نامعتبر است.");
+                    }
+                } catch (err) {
+                    alert("خطا در خواندن فایل. مطمئن شوید فایل JSON صحیح است.");
+                }
+                // پاک کردن ولیو برای امکان انتخاب مجدد همان فایل
+                input.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+    </script>
+</body>
+</html>
