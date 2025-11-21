@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مرکز رشد خلاقیت و فناوری سپاه کازرون | هکتوریا</title>
+    
+    <!-- اتصال فونت وزیرمتن (آنلاین) -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    
+    <!-- اتصال آیکون‌ها (FontAwesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- استایل‌های CSS -->
+    <style>
+        /* =========================================
+           1. تنظیمات پایه و متغیرها (ROOT VARIABLES)
+           ========================================= */
+        :root {
+            /* رنگ‌های تم تاریک (پیش‌فرض - واچ داگز) */
+            --bg-color: #0a0a0a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            
+            /* رنگ‌های نئونی */
+            --neon-red: #ff003c; /* لاکی/قرمز سایبرپانک */
+            --neon-green: #00ff88; /* سبز امامی نئونی */
+            --neon-blue: #00f3ff;
+            --neon-orange: #ff9e00;
+            
+            /* گلس مورفیسم تاریک */
+            --glass-bg: rgba(20, 20, 20, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            
+            /* گرادینت‌ها */
+            --gradient-main: linear-gradient(45deg, var(--neon-red), #70002c);
+            
+            /* فواصل */
+            --section-padding: 100px 20px;
+            --border-radius: 20px;
+        }
+
+        /* متغیرهای تم روشن */
+        body.light-mode {
+            --bg-color: #f0f2f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            
+            --neon-red: #d32f2f;
+            --neon-green: #388e3c;
+            --neon-blue: #0288d1;
+            --neon-orange: #f57c00;
+            
+            /* نئومورفیسم روشن */
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shadow: 
+                20px 20px 60px #d1d1d1, 
+                -20px -20px 60px #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            line-height: 1.8;
+        }
+
+        /* اسکرول بار اختصاصی گیمینگ */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-red); 
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-green); 
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        /* =========================================
+           2. انیمیشن‌ها و افکت‌های ویژه
+           ========================================= */
+        @keyframes neonPulse {
+            0% { text-shadow: 0 0 5px var(--neon-red), 0 0 10px var(--neon-red); }
+            50% { text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red), 0 0 30px var(--neon-red); }
+            100% { text-shadow: 0 0 5px var(--neon-red), 0 0 10px var(--neon-red); }
+        }
+
+        @keyframes floatItem {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes glitch {
+            0% { clip-path: inset(80% 0 0 0); transform: translate(-2px, 1px); }
+            20% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -1px); }
+            40% { clip-path: inset(40% 0 40% 0); transform: translate(-2px, 2px); }
+            60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
+            80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 1px); }
+            100% { clip-path: inset(30% 0 20% 0); transform: translate(1px, -1px); }
+        }
+
+        .neon-text {
+            color: #fff;
+            animation: neonPulse 2s infinite alternate;
+        }
+        
+        .neon-text-blue {
+            text-shadow: 0 0 5px var(--neon-blue), 0 0 15px var(--neon-blue);
+        }
+
+        /* افکت مه آلود (Foggy Saturation) */
+        .foggy-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--neon-red) 0%, rgba(0,0,0,0) 70%);
+            opacity: 0.15;
+            filter: blur(50px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* =========================================
+           3. کامپوننت‌های UI (دکمه‌ها، کارت‌ها)
+           ========================================= */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .btn-primary {
+            background: rgba(255, 0, 60, 0.1);
+            color: #fff;
+            border-color: var(--neon-red);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 0%; height: 100%;
+            background: var(--neon-red);
+            z-index: -1;
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .btn-primary:hover::before {
+            width: 100%;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            border-color: var(--neon-blue);
+        }
+
+        /* گوشه‌های خمیده خاص (Squircle style) */
+        .curved-corner {
+            border-radius: 30px 10px 30px 10px;
+        }
+
+        /* =========================================
+           4. ویدیو پس‌زمینه
+           ========================================= */
+        #bg-video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            overflow: hidden;
+        }
+
+        #bg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+            transition: opacity 0.5s ease;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* گرادینت برای محو شدن ویدیو در اسکرول */
+            background: linear-gradient(to bottom, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0.8) 40%, var(--bg-color) 100%);
+            pointer-events: none;
+        }
+
+        /* =========================================
+           5. انتخابگر تم (Theme Switcher Intro)
+           ========================================= */
+        #theme-intro {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .split-side {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            cursor: pointer;
+            transition: flex 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .split-dark {
+            background: #050505;
+            color: var(--neon-red);
+            border-left: 2px solid var(--neon-red);
+        }
+
+        .split-light {
+            background: #ffffff;
+            color: #0288d1;
+        }
+
+        .split-side:hover {
+            flex: 1.5;
+        }
+
+        .split-side h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            z-index: 2;
+        }
+
+        .split-side p {
+            z-index: 2;
+            font-weight: bold;
+        }
+
+        .intro-hidden {
+            transform: translateY(-100%);
+        }
+
+        /* =========================================
+           6. هدر (Header)
+           ========================================= */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 5px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .tech-emoji {
+            font-size: 1.5rem;
+            animation: floatItem 3s infinite ease-in-out;
+        }
+
+        .header-right a {
+            font-family: 'Courier New', Courier, monospace; /* استایل کدی */
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            padding: 5px 15px;
+            border-radius: 8px;
+        }
+        
+        .header-right a:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        /* =========================================
+           7. بخش‌های صفحه (Sections)
+           ========================================= */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        section {
+            min-height: 80vh; /* هر بخش تقریبا تمام صفحه */
+            display: flex;
+            align-items: center;
+            padding: var(--section-padding);
+            position: relative;
+        }
+
+        /* --- بخش 1: معرفی --- */
+        .hero-content {
+            text-align: center;
+            width: 100%;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        /* --- بخش 2: مسیر یادگیری --- */
+        .path-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 100%;
+        }
+
+        .path-card i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--neon-orange);
+        }
+
+        /* --- بخش 2.5: استاد و اسلایدر --- */
+        .instructor-section {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .instructor-info {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .achievements {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .mini-slider-container {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 20px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .mini-slider-container::-webkit-scrollbar {
+            height: 5px;
+        }
+
+        .slider-item {
+            display: inline-block;
+            padding: 15px 25px;
+            margin: 0 10px;
+            background: var(--glass-bg);
+            border-radius: 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+
+        .slider-item:hover {
+            border-color: var(--neon-red);
+            background: rgba(255,0,60,0.2);
+        }
+
+        /* --- بخش دوره‌ها (طراحی زیگزاگ) --- */
+        .course-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 50px;
+        }
+
+        .course-layout.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .course-content {
+            flex: 1;
+        }
+
+        .course-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* فریم تصویر کاراکتر (9:20 Aspect Ratio) */
+        .character-frame {
+            width: 300px;
+            height: 666px; /* نسبت تقریبی 9:20 برای موبایل مدرن */
+            background: rgba(0,0,0,0.5);
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            display: flex;
+            align-items: flex-end; /* کاراکتر از پایین */
+            justify-content: center;
+        }
+
+        .character-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .character-frame:hover .character-placeholder {
+            transform: scale(1.05);
+        }
+
+        /* برای ویدیو ICDL */
+        .video-box {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 1px solid var(--neon-red);
+            overflow: hidden;
+        }
+
+        .play-btn {
+            font-size: 3rem;
+            color: #fff;
+            z-index: 5;
+            cursor: pointer;
+        }
+
+        .course-icon {
+            position: absolute;
+            top: -30px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: var(--bg-color);
+            border: 2px solid var(--neon-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 20px rgba(0,255,136,0.3);
+            z-index: 10;
+        }
+
+        .course-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--neon-blue);
+        }
+        
+        body.light-mode .course-title {
+            color: #0056b3;
+        }
+
+        .course-desc {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        /* --- فوتر و اطلاعات --- */
+        .footer-info {
+            background: linear-gradient(to top, #000000, transparent);
+            padding-top: 50px;
+            text-align: center;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            text-align: right;
+            margin-bottom: 50px;
+        }
+
+        .info-item h4 {
+            color: var(--neon-red);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .designer-credit {
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* =========================================
+           8. واکنش‌گرایی (Responsive)
+           ========================================= */
+        @media (max-width: 992px) {
+            .hero-title { font-size: 3rem; }
+            .course-layout, .course-layout.reverse {
+                flex-direction: column-reverse;
+                text-align: center;
+            }
+            .character-frame {
+                width: 80%;
+                max-width: 300px;
+                height: 400px; /* کوتاه تر برای موبایل */
+                margin: 0 auto;
+            }
+            .course-content {
+                width: 100%;
+            }
+            .info-grid { text-align: center; }
+            .course-icon {
+                right: 50%;
+                transform: translateX(50%);
+            }
+        }
+
+        @media (max-width: 480px) {
+            header { padding: 10px 15px; flex-direction: column; gap: 10px; }
+            .header-left { width: 100%; justify-content: center; }
+            .hero-title { font-size: 2.2rem; }
+            .btn { width: 100%; }
+            .designer-credit { flex-direction: column; gap: 15px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- انتخابگر تم (اولین چیزی که کاربر می‌بیند) -->
+    <div id="theme-intro">
+        <div class="split-side split-light" onclick="setTheme('light')">
+            <h2>حالت روشن</h2>
+            <p>شفافیت و انرژی</p>
+            <i class="fas fa-sun fa-3x" style="margin-top:20px"></i>
+        </div>
+        <div class="split-side split-dark" onclick="setTheme('dark')">
+            <h2>حالت تاریک</h2>
+            <p>استایل گیمینگ و نئون</p>
+            <i class="fas fa-gamepad fa-3x" style="margin-top:20px"></i>
+        </div>
+    </div>
+
+    <!-- ویدیو پس‌زمینه -->
+    <div id="bg-video-container">
+        <video id="bg-video" autoplay muted loop playsinline>
+            <!-- خط زیر را تغییر دهید -->
+            <source src="dark.mp4" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+
+
+    <!-- هدر سایت -->
+    <header class="glass-card" style="border-radius: 0 0 20px 20px; margin: 0;">
+        <div class="header-left">
+            <span>مرکز رشد خلاقیت و فناوری سپاه کازرون</span>
+            <span class="tech-emoji">🤖</span>
+        </div>
+        <div class="header-right">
+            <a href="https://hectoria-group.github.io/hectoria.github.io/index.html" target="_blank">
+                HECTORIA
+            </a>
+        </div>
+    </header>
+
+    <!-- بخش 1: معرفی اصلی -->
+    <section id="intro">
+        <div class="foggy-glow" style="top: 20%; right: 20%;"></div>
+        <div class="container hero-content">
+            <h1 class="hero-title neon-text">
+                آماده ای برای <br>
+                <span style="color: var(--neon-green);">کشف، ساختن و تسخیر</span>
+                <br>دنیای دیجیتال؟
+            </h1>
+            <p class="hero-subtitle">
+                ورود به دنیای برنامه نویسی، هوش مصنوعی و گرافیک با متدهای نوین
+            </p>
+            <a href="#courses-start" class="btn btn-primary">شروع ماجراجویی <i class="fas fa-arrow-down" style="margin-right:10px;"></i></a>
+        </div>
+    </section>
+
+    <!-- بخش 2: مسیر یادگیری -->
+    <section id="learning-path">
+        <div class="container">
+            <h2 class="neon-text-blue" style="text-align: center; margin-bottom: 50px; font-size: 2.5rem;">مسیر تبدیل شدن به یک حرفه‌ای</h2>
+            <div class="path-grid">
+                <div class="glass-card curved-corner">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>یادگیری اصول</h3>
+                    <p>از صفر مطلق شروع کنید. نیازی به دانش قبلی نیست، فقط اشتیاق کافیست.</p>
+                </div>
+                <div class="glass-card curved-corner">
+                    <i class="fas fa-code"></i>
+                    <h3>پروژه محور</h3>
+                    <p>تئوری خسته کننده است. اینجا با ساختن بازی و نرم‌افزار یاد می‌گیرید.</p>
+                </div>
+                <div class="glass-card curved-corner">
+                    <i class="fas fa-rocket"></i>
+                    <h3>ورود به بازار</h3>
+                    <p>رزومه سازی و آمادگی برای کسب درآمد از مهارت‌هایتان.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- بخش 2.5: درباره استاد و اسلایدر -->
+    <section class="instructor-section">
+        <div class="container">
+            <div class="glass-card instructor-info" style="border: 1px solid var(--neon-green);">
+                <h2 style="color: var(--neon-green);">مدرس: مهندس زیبا دهقانی</h2>
+                <p>مدرس دانشگاه | متخصص هوش مصنوعی و توسعه نرم‌افزار</p>
+                <div class="achievements">
+                    <span class="badge">🏆 10+ سال تجربه</span>
+                    <span class="badge">🎓 استاد برتر</span>
+                    <span class="badge">💻 توسعه دهنده ارشد</span>
+                </div>
+            </div>
+
+            <!-- اسلایدر کوچک دوره‌ها -->
+            <div class="mini-slider-container">
+                <div class="slider-item" onclick="scrollToSection('course-icdl')">🖥️ مهارت‌های ICDL</div>
+                <div class="slider-item" onclick="scrollToSection('course-code')">🐍 پایتون و برنامه نویسی</div>
+                <div class="slider-item" onclick="scrollToSection('course-ai')">🧠 هوش مصنوعی</div>
+                <div class="slider-item" onclick="scrollToSection('course-anim')">🎬 انیمیشن سازی</div>
+                <div class="slider-item" onclick="scrollToSection('course-code')">☕ جاوا و C#</div>
+            </div>
+            <p style="text-align: center; font-size: 0.8rem; margin-top: 10px; opacity: 0.7;">(برای مشاهده جزئیات روی دوره‌ها کلیک کنید یا اسکرول کنید)</p>
+        </div>
+    </section>
+
+    <div id="courses-start"></div>
+
+    <!-- بخش 3: دوره ICDL -->
+    <section id="course-icdl">
+        <div class="container course-layout">
+            <div class="course-content">
+                <div class="video-box">
+                    <i class="fas fa-play-circle play-btn"></i>
+                    <!-- در اینجا می‌توانید تگ video واقعی قرار دهید -->
+    <video controls poster="icdl.png" style="width: 100%; height: 100%; object-fit: cover;">
+        <source src="icdl.mp4" type="video/mp4">
+        مرورگر شما پشتیبانی نمی‌کند.
+    </video>
+                </div>
+                <div class="course-icon">
+                    <i class="fas fa-laptop"></i>
+                </div>
+                <h2 class="course-title">دوره جامع ICDL</h2>
+                <p class="course-desc">
+                    تسلط بر کامپیوتر دیگر یک انتخاب نیست، یک ضرورت است. یادگیری ورد، اکسل، پاورپوینت و ویندوز به صورت کاملا کاربردی برای بازار کار.
+                </p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a onclick="sendWhatsapp('ثبت نام دوره ICDL')" class="btn btn-primary" style="background: var(--neon-blue); border-color: var(--neon-blue);">ثبت نام سریع</a>
+                    <a onclick="sendWhatsapp('راهنمایی درباره دوره ICDL')" class="btn" style="border: 1px solid #fff;">مشاوره رایگان</a>
+                </div>
+            </div>
+            <div class="course-visual">
+                <!-- تصویر کاراکتر -->
+                <div class="character-frame">
+                    <!-- تصویر پلیس هولدر (می توانید با عکس واقعی جایگزین کنید) -->
+                    <img src="icdl.png" alt="ICDL Character" class="character-placeholder">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- بخش 4: برنامه نویسی (پایتون، جاوا، سی شارپ) -->
+    <section id="course-code">
+        <div class="container course-layout reverse">
+            <div class="course-content">
+                                <div class="video-box">
+                    <i class="fas fa-play-circle play-btn"></i>
+    <video controls poster="code.png" style="width: 100%; height: 100%; object-fit: cover;">
+        <source src="code.mp4" type="video/mp4">
+        مرورگر شما پشتیبانی نمی‌کند.
+    </video>                </div>
+                <div class="course-icon" style="border-color: var(--neon-orange); box-shadow: 0 0 20px rgba(255, 158, 0, 0.3);">
+                    <i class="fas fa-code" style="color: var(--neon-orange);"></i>
+                </div>
+                <h2 class="course-title" style="color: var(--neon-orange);">برنامه نویسی حرفه‌ای</h2>
+                <h3 style="margin-bottom: 15px; color: var(--text-secondary);">Python | Java | C# | Web</h3>
+                <p class="course-desc">
+                    کدنویسی زبان آینده است. از طراحی سایت گرفته تا ساخت نرم‌افزارهای دسکتاپ. با پایتون هوشمند شوید و با جاوا و سی‌شارپ سیستم‌های قدرتمند بسازید.
+                </p>
+                <a onclick="sendWhatsapp('ثبت نام دوره برنامه نویسی')" class="btn btn-primary" style="background: rgba(255, 158, 0, 0.2); border-color: var(--neon-orange);">ثبت نام کدنویسی</a>
+            </div>
+            <div class="course-visual">
+                <div class="character-frame" style="border-color: var(--neon-orange); box-shadow: 0 0 30px rgba(255, 158, 0, 0.2);">
+                     <img src="code.png" alt="Coder Character" class="character-placeholder">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- بخش 5: هوش مصنوعی -->
+    <section id="course-ai">
+        <div class="container course-layout">
+            <div class="course-content">
+                                <div class="video-box">
+                    <i class="fas fa-play-circle play-btn"></i>
+    <video controls poster="future.png" style="width: 100%; height: 100%; object-fit: cover;">
+        <source src="future.mp4" type="video/mp4">
+        مرورگر شما پشتیبانی نمی‌کند.
+    </video>                </div>
+                <div class="course-icon" style="border-color: var(--neon-red);">
+                    <i class="fas fa-brain" style="color: var(--neon-red);"></i>
+                </div>
+                <h2 class="course-title" style="color: var(--neon-red);">هوش مصنوعی (AI)</h2>
+                <p class="course-desc">
+                    آشنایی با دنیای ماشین لرنینگ، شبکه های عصبی و ابزارهای نوین AI. آینده همینجاست، عقب نمانید.
+                </p>
+                <a onclick="sendWhatsapp('ثبت نام دوره هوش مصنوعی')" class="btn btn-primary">ثبت نام AI</a>
+            </div>
+            <div class="course-visual">
+                <div class="character-frame" style="border-color: var(--neon-red); box-shadow: 0 0 30px rgba(255, 0, 60, 0.2);">
+                    <img src="future.png" alt="AI Robot" class="character-placeholder" style="width: 90%; margin-bottom: 50px;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- بخش 6: انیمیشن سازی -->
+    <section id="course-anim">
+        <div class="container course-layout reverse">
+            <div class="course-content">
+                                <div class="video-box">
+                    <i class="fas fa-play-circle play-btn"></i>
+    <video controls poster="animation.png" style="width: 100%; height: 100%; object-fit: cover;">
+        <source src="animation.mp4" type="video/mp4">
+        مرورگر شما پشتیبانی نمی‌کند.
+    </video>                </div>
+                <div class="course-icon" style="border-color: #d600ff;">
+                    <i class="fas fa-film" style="color: #d600ff;"></i>
+                </div>
+                <h2 class="course-title" style="color: #d600ff;">انیمیشن سازی</h2>
+                <p class="course-desc">
+                    خلق دنیاهای خیالی. یادگیری اصول حرکت، کاراکتر سازی و ساخت انیمیشن‌های جذاب برای تبلیغات یا سرگرمی.
+                </p>
+                <a onclick="sendWhatsapp('ثبت نام دوره انیمیشن سازی')" class="btn btn-primary" style="background: rgba(214, 0, 255, 0.2); border-color: #d600ff;">ثبت نام انیمیشن</a>
+            </div>
+            <div class="course-visual">
+                <div class="character-frame" style="border-color: #d600ff; box-shadow: 0 0 30px rgba(214, 0, 255, 0.2);">
+                     <img src="animation.png" alt="Animator" class="character-placeholder">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- فوتر و اطلاعات تماس -->
+    <section class="footer-info" id="contact">
+        <div class="container">
+            <div class="info-grid">
+                <div class="info-item glass-card">
+                    <h4><i class="fas fa-map-marker-alt"></i> آدرس</h4>
+                    <p>کازرون، خیابان طالقانی، کوچه روبرو مسجد ابوالفضل</p>
+                    <p>سمت چپ درب دوم</p>
+                    <p style="font-weight: bold; color: var(--neon-green);">مرکز رشد خلاقیت و فناوری سپاه کازرون</p>
+                </div>
+                
+                <div class="info-item glass-card">
+                    <h4><i class="fas fa-calendar-alt"></i> تاریخ شروع</h4>
+                    <p style="font-size: 1.5rem; font-weight: bold;">۱۵ آذر ماه</p>
+                    <p>ویژه دانش‌آموزان، جوانان و دانشجویان</p>
+                </div>
+
+                <div class="info-item glass-card">
+                    <h4><i class="fas fa-phone"></i> تماس و مدیریت</h4>
+                    <p>با مدیریت: مهندس زیبا دهقانی</p>
+                    <p>شماره تماس: 09357210104</p>
+                    <a onclick="sendWhatsapp('سلام، سوال داشتم')" class="btn btn-primary" style="margin-top: 10px; padding: 5px 15px; font-size: 0.9rem;">ارسال پیام</a>
+                </div>
+            </div>
+
+            <!-- کپی رایت و طراح -->
+            <div class="designer-credit">
+                <div>
+                    <p>© تمامی حقوق محفوظ است | مرکز رشد کازرون</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span>طراحی و توسعه: <strong class="neon-text-blue">سعید رستمی</strong></span>
+                    <a href="https://wa.me/989227931379" class="btn" style="padding: 5px 15px; font-size: 0.8rem; border-color: var(--neon-blue);">ارتباط با طراح</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- جاوا اسکریپت -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        // ثبت پلاگین اسکرول تریگر
+        gsap.registerPlugin(ScrollTrigger);
+
+        // تابع تغییر تم
+        // تابع تغییر تم
+        function setTheme(mode) {
+            const body = document.body;
+            const intro = document.getElementById('theme-intro');
+            const video = document.getElementById('bg-video'); // گرفتن المنت ویدیو
+            
+            // انیمیشن خروج صفحه انتخاب
+            intro.classList.add('intro-hidden');
+
+            if (mode === 'light') {
+                // === تنظیمات حالت روشن ===
+                body.classList.add('light-mode');
+                
+                // تغییر آدرس ویدیو به ویدیوی روشن
+                video.src = "light.mp4"; 
+                
+                // حذف فیلترهای قبلی (اگر وجود داشت)
+                video.style.filter = "none"; 
+
+            } else {
+                // === تنظیمات حالت تاریک ===
+                body.classList.remove('light-mode');
+                
+                // تغییر آدرس ویدیو به ویدیوی تاریک (واچ داگز)
+                video.src = "dark.mp4";
+                
+                video.style.filter = "none";
+            }
+            
+            // دستور پخش مجدد ویدیو (چون وقتی سورس عوض میشه ممکنه استپ بشه)
+            video.play();
+
+            // شروع انیمیشن‌های صفحه بعد از انتخاب تم
+            initAnimations();
+        }
+
+        // اسکرول به بخش خاص
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ارسال به واتساپ
+        function sendWhatsapp(message) {
+            const phone = "989171234210";
+            const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        // انیمیشن‌ها
+        function initAnimations() {
+            // انیمیشن هدر
+            gsap.from("header", {
+                y: -100,
+                duration: 1,
+                ease: "power4.out",
+                delay: 0.5
+            });
+
+            // انیمیشن متن هیرو
+            gsap.from(".hero-title", {
+                opacity: 0,
+                y: 50,
+                duration: 1.5,
+                ease: "back.out(1.7)",
+                delay: 0.8
+            });
+
+            // انیمیشن برای کارت‌های مسیر یادگیری
+            gsap.utils.toArray('.path-card').forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 85%",
+                    },
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.8,
+                    delay: i * 0.2
+                });
+            });
+
+            // انیمیشن بخش‌های دوره (چپ و راست آمدن)
+            gsap.utils.toArray('.course-layout').forEach((section, i) => {
+                const content = section.querySelector('.course-content');
+                const visual = section.querySelector('.course-visual');
+                
+                // حرکت متن
+                gsap.from(content, {
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 70%",
+                    },
+                    x: i % 2 === 0 ? 100 : -100, // یکی از چپ یکی از راست
+                    opacity: 0,
+                    duration: 1,
+                    ease: "power2.out"
+                });
+
+                // حرکت تصویر
+                gsap.from(visual, {
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 70%",
+                    },
+                    scale: 0.8,
+                    opacity: 0,
+                    duration: 1.2,
+                    ease: "elastic.out(1, 0.5)"
+                });
+            });
+
+            // افکت پارالاکس برای ویدیو بک گراند (تاریک شدن هنگام اسکرول)
+            gsap.to(".video-overlay", {
+                scrollTrigger: {
+                    trigger: "body",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: true
+                },
+                background: "linear-gradient(to bottom, rgba(10,10,10,0.8) 0%, rgba(10,10,10,1) 80%)"
+            });
+        }
+
+    </script>
+</body>
+</html>
