@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="نظرسنجی سینما دانشگاه آزاد اسلامی واحد کازرون - هکتوریا">
+    <title>هکتوریا | نظرسنجی سینما</title>
+    
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ========================================
+        GLOBAL STYLES & RESET
+        ========================================
+        */
+        :root {
+            --bg-color: #fcfcfc; /* سفید خیلی روشن */
+            --text-main: #2d3436;
+            --text-light: #636e72;
+            --neon-primary: #0984e3; /* آبی نئون */
+            --neon-accent: #e84393; /* صورتی نئون برای سینما */
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --shadow-soft: 0 10px 40px -10px rgba(0,0,0,0.08);
+            --shadow-neon: 0 0 15px rgba(9, 132, 227, 0.4);
+            --radius-box: 30px;
+            --radius-btn: 50px;
+            --font-main: 'Vazirmatn', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.8;
+            scroll-behavior: smooth;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* اسکرول بار زیبا */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-primary); border-radius: 10px; }
+
+        /* ========================================
+        ORIENTATION WARNING (Desktop/Landscape)
+        ========================================
+        */
+        #orientation-lock {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff;
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* نمایش پیام فقط در حالت افقی یا صفحات خیلی بزرگ */
+        @media screen and (min-width: 1024px), screen and (orientation: landscape) and (max-height: 600px) {
+            #orientation-lock { display: flex; }
+            #main-app { display: none; }
+        }
+
+        .lock-icon {
+            font-size: 4rem;
+            color: var(--neon-accent);
+            margin-bottom: 20px;
+            animation: rotate-phone 2s infinite ease-in-out;
+        }
+
+        @keyframes rotate-phone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* ========================================
+        LAYOUT & CONTAINERS
+        ========================================
+        */
+        .container {
+            width: 100%;
+            max-width: 500px; /* محدود کردن عرض برای حس موبایل */
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        section {
+            margin-bottom: 60px;
+            opacity: 0; /* برای انیمیشن ورود */
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ========================================
+        COMPONENTS: GLASSMORPHISM & NEON
+        ========================================
+        */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 2px solid #ffffff;
+            border-radius: var(--radius-box);
+            padding: 25px;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* افکت نئونی ملایم دور کارت‌ها */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(9,132,227,0.05) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .neon-text {
+            color: var(--neon-primary);
+            text-shadow: 0 0 10px rgba(9, 132, 227, 0.3);
+        }
+
+        .neon-text-accent {
+            color: var(--neon-accent);
+            text-shadow: 0 0 10px rgba(232, 67, 147, 0.3);
+        }
+
+        .btn-neon {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            border-radius: var(--radius-btn);
+            background: #fff;
+            color: var(--text-main);
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-align: center;
+            border: 2px solid transparent;
+            box-shadow: 5px 5px 20px rgba(0,0,0,0.05), -5px -5px 20px #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-neon:active {
+            transform: scale(0.96);
+            box-shadow: inset 5px 5px 10px rgba(0,0,0,0.05), inset -5px -5px 10px #ffffff;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-primary), #74b9ff);
+            color: white;
+            box-shadow: 0 10px 20px rgba(9, 132, 227, 0.3);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 0 20px var(--neon-primary);
+        }
+
+        /* ========================================
+        HEADER
+        ========================================
+        */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+
+        .logo-icon {
+            color: var(--neon-primary);
+            font-size: 1.5rem;
+            filter: drop-shadow(0 0 5px rgba(9,132,227,0.5));
+        }
+
+        /* ========================================
+        HERO SECTION
+        ========================================
+        */
+        .hero-title {
+            font-size: 1.8rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            font-weight: 900;
+        }
+
+        .price-badge {
+            display: inline-block;
+            background: rgba(232, 67, 147, 0.1);
+            color: var(--neon-accent);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            border: 1px solid rgba(232, 67, 147, 0.3);
+        }
+
+        .discount-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            font-size: 1.2rem;
+        }
+
+        .old-price {
+            text-decoration: line-through;
+            color: #b2bec3;
+            font-size: 1rem;
+        }
+
+        .new-price {
+            font-weight: 900;
+            color: var(--neon-accent);
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { text-shadow: 0 0 5px rgba(232, 67, 147, 0); }
+            50% { text-shadow: 0 0 20px rgba(232, 67, 147, 0.6); }
+            100% { text-shadow: 0 0 5px rgba(232, 67, 147, 0); }
+        }
+
+        /* ========================================
+        INFO SECTION (Did you know)
+        ========================================
+        */
+        .info-icon-large {
+            font-size: 3rem;
+            color: #fab1a0;
+            margin-bottom: 15px;
+            display: block;
+            text-align: center;
+        }
+
+        .highlight-text {
+            background: linear-gradient(120deg, rgba(255, 234, 167, 0.5) 0%, rgba(255, 234, 167, 0) 100%);
+            padding: 2px 5px;
+            border-radius: 5px;
+        }
+
+        /* ========================================
+        MOVIE SELECTION (Cards)
+        ========================================
+        */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .movie-card {
+            position: relative;
+            border-radius: 25px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+
+        .movie-card.selected {
+            border-color: var(--neon-primary);
+            box-shadow: 0 0 20px rgba(9, 132, 227, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 200px;
+            background-color: #dfe6e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #b2bec3;
+            font-size: 3rem;
+            position: relative;
+        }
+        
+        /* افکت شیشه‌ای روی پوستر */
+        .movie-poster::after {
+            content: '';
+            position: absolute;
+            top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+        }
+
+        .movie-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .movie-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .trailer-link {
+            font-size: 0.8rem;
+            color: var(--neon-accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+            position: relative; /* برای اینکه روی کلیک کارت تاثیر نگذارد */
+        }
+
+        /* نشانگر اولویت */
+        .priority-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 35px;
+            height: 35px;
+            background: var(--neon-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 0 10px var(--neon-primary);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 2;
+        }
+
+        .movie-card.selected .priority-badge {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* فیلد پیشنهاد فیلم */
+        .custom-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 20px;
+            background: #fff;
+            margin-top: 20px;
+            font-family: var(--font-main);
+            transition: 0.3s;
+        }
+
+        .custom-input:focus {
+            border-color: var(--neon-primary);
+            box-shadow: 0 0 15px rgba(9, 132, 227, 0.1);
+        }
+
+        /* ========================================
+        DATE SELECTION
+        ========================================
+        */
+        .date-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .date-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .date-box {
+            flex: 1;
+            height: 100px;
+            background: #fff;
+            border-radius: var(--radius-box);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-soft);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .date-box.active {
+            background: rgba(9, 132, 227, 0.05);
+            border-color: var(--neon-primary);
+            color: var(--neon-primary);
+            box-shadow: var(--shadow-neon);
+        }
+
+        .date-day { font-size: 0.9rem; opacity: 0.8; }
+        .date-number { font-size: 1.4rem; font-weight: 900; }
+
+        .date-picker-custom {
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            border-radius: 20px;
+            border: 1px dashed #ccc;
+            background: transparent;
+            margin-top: 10px;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+        
+        /* ========================================
+        TEAM & FOOTER
+        ========================================
+        */
+        .team-grid {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 20px;
+            border: 1px solid white;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background: #dfe6e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #636e72;
+        }
+
+        .member-info h4 { font-size: 0.95rem; margin-bottom: 3px; }
+        .member-info p { font-size: 0.8rem; color: var(--text-light); }
+
+        footer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            padding: 40px 0;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            margin-top: 40px;
+        }
+
+        /* ========================================
+        MODAL (Custom Alert)
+        ========================================
+        */
+        .custom-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 30px;
+            text-align: center;
+            width: 100%;
+            max-width: 350px;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--neon-primary);
+        }
+/* ========================================
+        LOADING SCREEN STYLES
+        ========================================
+        */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            z-index: 10001; /* بالاتر از همه چیز حتی پیام چرخش موبایل */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .loading-icon-box {
+            font-size: 5rem;
+            color: var(--neon-primary);
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 15px rgba(9, 132, 227, 0.6));
+            animation: balance-swing 3s infinite ease-in-out;
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .loading-subtext {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        /* نوار پیشرفت نئونی */
+        .progress-container {
+            width: 200px;
+            height: 6px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--neon-accent);
+            width: 0%;
+            box-shadow: 0 0 10px var(--neon-accent);
+            border-radius: 10px;
+            animation: fill-bar 6s linear forwards; /* 6 ثانیه طول میکشد */
+        }
+
+        @keyframes balance-swing {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @keyframes fill-bar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* کلاس مخفی کننده */
+        .hidden-loader {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="loading-icon-box">
+            <i class="fa-solid fa-scale-balanced"></i>
+        </div>
+        <h2 class="loading-text">کانون حقوق خانواده</h2>
+        <p class="loading-subtext">با همکاری کانون فضای مجازی برگزار می‌کند</p>
+        
+        <div style="margin-top: 20px; font-size: 0.8rem; color: #aaa;">
+            در حال بارگذاری نظرسنجی...
+        </div>
+        
+        <div class="progress-container" style="margin-top: 15px;">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+    <div id="orientation-lock">
+        <div class="lock-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+        <h2>لطفاً از موبایل استفاده کنید</h2>
+        <p>برای تجربه بهتر، صفحه نمایش را عمودی نگه دارید.</p>
+        <p style="font-size: 0.8rem; color: #aaa; margin-top: 20px;">Designed by Mohandes Service</p>
+    </div>
+
+    <div id="main-app" class="container">
+        
+        <header>
+            <div class="logo-area">
+                <i class="fa-solid fa-layer-group logo-icon"></i>
+                <span>هکتوریا</span>
+            </div>
+            <div style="font-size: 0.8rem; opacity: 0.5;">v1.0</div>
+        </header>
+
+        <section id="hero-section" class="visible">
+            <div class="glass-card">
+                <span class="price-badge">ویژه دانشجویان</span>
+                <h1 class="hero-title">
+                    برگزاری سینما در <span class="neon-text">دانشگاه آزاد اسلامی کازرون</span> در مسیر وقوع است!
+                </h1>
+                <p style="margin-bottom: 20px; color: var(--text-light);">
+                    فیلم‌های روی پرده را در دانشگاه ببینید.
+                </p>
+                
+                <div class="discount-box">
+                    <span class="old-price">90,000</span>
+                    <i class="fa-solid fa-arrow-left" style="font-size: 0.8rem; color: #ccc;"></i>
+                    <span class="new-price">45,000 ت</span>
+                </div>
+                <div style="text-align: center; font-size: 0.8rem; color: var(--neon-accent); margin-bottom: 20px;">
+                    (50 درصد تخفیف واقعی)
+                </div>
+
+                <button class="btn-neon btn-primary" onclick="scrollToSection('info-section')">
+                    شرکت در نظرسنجی <i class="fa-solid fa-chevron-down" style="margin-right: 10px;"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="info-section">
+            <div class="glass-card" style="border-color: var(--neon-accent);">
+                <i class="fa-regular fa-lightbulb info-icon-large"></i>
+                <h2 style="margin-bottom: 15px;">میدونستی؟ 🤔</h2>
+                <p style="margin-bottom: 15px;">
+                    طی تلاش‌های دبیر کانون فضای مجازی، <span class="highlight-text">آقای رستمی</span>:
+                </
+                <ul style="margin-bottom: 25px;">
+                    <li style="margin-bottom: 10px;"><i class="fa-solid fa-check" style="color: var(--neon-accent); margin-left: 5px;"></i> بلیط کودکان و افراد زیر 16 سال (همراه دانشجو) <b>رایگان</b> است.</li>
+                    <li><i class="fa-solid fa-check" style="color: var(--neon-accent); margin-left: 5px;"></i> خانواده دانشجو با <b>55% تخفیف</b> می‌توانند کنار هم بنشینند.</li>
+                </ul>
+                <button class="btn-neon" onclick="scrollToSection('movies-section')">
+                    خوشحال شدم، بریم نظرسنجی <i class="fa-solid fa-face-smile" style="color: #fab1a0;"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="movies-section">
+            <h3 class="neon-text" style="margin-bottom: 10px; border-right: 4px solid var(--neon-primary); padding-right: 10px;">کدام فیلم را می‌پسندید؟</h3>
+            <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 20px;">اولویت‌های خود را با لمس کردن انتخاب کنید (دوبار لمس برای لغو).</p>
+            
+            <div class="movies-grid">
+                <div class="movie-card" onclick="toggleMovie(this, 'مرد عینکی')">
+                    <div class="priority-badge"></div>
+                    <div class="movie-poster">
+                        <i class="fa-solid fa-glasses"></i>
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-title">مرد عینکی</div>
+                        <a href="#" class="trailer-link" onclick="event.stopPropagation(); alert('پخش تریلر مرد عینکی (لینک نمونه)')">
+                            <i class="fa-solid fa-play"></i> مشاهده تریلر
+                        </a>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="toggleMovie(this, 'کفایت مذاکرات')">
+                    <div class="priority-badge"></div>
+                    <div class="movie-poster">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-title">کفایت مذاکرات</div>
+                        <a href="#" class="trailer-link" onclick="event.stopPropagation(); alert('پخش تریلر...')">
+                            <i class="fa-solid fa-play"></i> مشاهده تریلر
+                        </a>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="toggleMovie(this, 'قسطنطنیه')">
+                    <div class="priority-badge"></div>
+                    <div class="movie-poster">
+                        <i class="fa-solid fa-mosque"></i>
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-title">قسطنطنیه</div>
+                        <a href="#" class="trailer-link" onclick="event.stopPropagation(); alert('پخش تریلر...')">
+                            <i class="fa-solid fa-play"></i> مشاهده تریلر
+                        </a>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="toggleMovie(this, 'خانه ارواح')">
+                    <div class="priority-badge"></div>
+                    <div class="movie-poster">
+                        <i class="fa-solid fa-ghost"></i>
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-title">خانه ارواح</div>
+                        <a href="#" class="trailer-link" onclick="event.stopPropagation(); alert('پخش تریلر...')">
+                            <i class="fa-solid fa-play"></i> مشاهده تریلر
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <input type="text" id="suggested-movie" class="custom-input" placeholder="اگر هیچکدام، فیلم پیشنهادی شما؟">
+
+            <div style="margin-top: 25px;">
+                <button class="btn-neon btn-primary" onclick="validateMovies()">
+                    تایید و مرحله بعد <i class="fa-solid fa-arrow-down"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="dates-section">
+            <h3 class="neon-text-accent" style="margin-bottom: 20px; border-right: 4px solid var(--neon-accent); padding-right: 10px;">زمان پیشنهادی شما؟</h3>
+            
+            <div class="date-container">
+                <div class="date-row">
+                    <div class="date-box" onclick="toggleDate(this, 'سه شنبه 25 آذر')">
+                        <span class="date-day">سه شنبه</span>
+                        <span class="date-number">25 آذر</span>
+                        <i class="fa-regular fa-circle-check check-icon" style="margin-top: 5px; opacity: 0;"></i>
+                    </div>
+                    <div class="date-box" onclick="toggleDate(this, 'چهارشنبه 26 آذر')">
+                        <span class="date-day">چهارشنبه</span>
+                        <span class="date-number">26 آذر</span>
+                        <i class="fa-regular fa-circle-check check-icon" style="margin-top: 5px; opacity: 0;"></i>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; font-size: 0.8rem; margin: 5px 0;">یا انتخاب بازه دیگر:</div>
+                
+                <select class="date-picker-custom" id="custom-date-select" onchange="resetDateBoxes()">
+                    <option value="">انتخاب تاریخ دیگر (24 تا 27 آذر)</option>
+                    <option value="دوشنبه 24 آذر">دوشنبه 24 آذر</option>
+                    <option value="پنجشنبه 27 آذر">پنجشنبه 27 آذر</option>
+                </select>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <button class="btn-neon" style="background: #00b894; color: white; border: none;" onclick="submitVote()">
+                    ثبت رای نهایی <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <p style="font-size: 0.7rem; text-align: center; margin-top: 10px; opacity: 0.6;">
+                    برای تایید نهایی به واتساپ منتقل می‌شوید.
+                </p>
+            </div>
+        </section>
+
+        <section id="team-section" class="visible">
+            <div style="width: 100%; height: 1px; background: #eee; margin-bottom: 30px;"></div>
+            <h3 style="text-align: center; margin-bottom: 20px;">تیم برگزاری</h3>
+            
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="avatar"><i class="fa-solid fa-code"></i></div>
+                    <div class="member-info">
+                        <h4>  رستمی</h4>
+                        <p>طراح و توسعه سایت، دبیر کانون فضای مجازی علم برتر</p>
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="avatar"><i class="fa-solid fa-chart-pie"></i></div>
+                    <div class="member-info">
+                        <h4>محمد مجیدی</h4>
+                        <p>مشاور آمار و محقق بازار، رشته حقوق دانشگاه آزاد کازرون</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div style="margin-bottom: 10px;">
+                <i class="fa-solid fa-university" style="font-size: 1.5rem; color: #ccc;"></i>
+            </div>
+            <p>معاونت فرهنگی و دانشجویی دانشگاه آزاد اسلامی واحد کازرون</p>
+            <p style="margin-top: 5px;">تمامی حقوق محفوظ است © 1403</p>
+        </footer>
+
+    </div>
+
+    <div id="final-modal" class="custom-modal">
+        <div class="modal-content">
+            <i class="fa-solid fa-face-grin-stars modal-icon"></i>
+            <h3>عالی شد!</h3>
+            <p style="margin: 15px 0; color: #636e72;">
+                سینما ارزششو داره که کلاستو تعطیل کنی، پس تعیین زمانش با ما حضورش با شما :)))
+            </p>
+            <button class="btn-neon btn-primary" onclick="redirectToWhatsapp()">
+                ارسال به واتساپ
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // JAVASCRIPT LOGIC
+        // ============================================
+
+        // متغیرهای ذخیره اطلاعات
+        let selectedMovies = [];
+        let selectedDates = [];
+        
+        // 1. اسکرول نرم و نمایش انیمیشن‌ها
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            element.classList.add('visible');
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Observer برای انیمیشن هنگام اسکرول
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('section').forEach(sec => {
+            observer.observe(sec);
+        });
+
+        // 2. لاجیک انتخاب فیلم (اولویت بندی)
+        function toggleMovie(card, movieName) {
+            const badge = card.querySelector('.priority-badge');
+            
+            // اگر قبلا انتخاب شده، حذفش کن
+            if (card.classList.contains('selected')) {
+                card.classList.remove('selected');
+                // حذف از آرایه
+                selectedMovies = selectedMovies.filter(m => m !== movieName);
+                badge.innerText = '';
+                // بازسازی اولویت بقیه
+                reorderPriorities();
+            } else {
+                // انتخاب جدید
+                card.classList.add('selected');
+                selectedMovies.push(movieName);
+                badge.innerText = selectedMovies.length;
+            }
+            
+            // اگر فیلم انتخاب کرد، ورودی دستی رو پاک کن
+            if (selectedMovies.length > 0) {
+                document.getElementById('suggested-movie').value = '';
+            }
+        }
+
+        function reorderPriorities() {
+            // پیدا کردن تمام کارت‌های انتخاب شده و آپدیت عدد باج
+            const cards = document.querySelectorAll('.movie-card.selected');
+            // این روش ساده است اما چون DOM و آرایه ما همگام نیستند، بهتره بر اساس آرایه رفرش کنیم
+            // اما چون نام فیلم در DOM ذخیره نشده (فقط در آرگومان تابع)، ساده‌ترین راه
+            // ریست کردن همه و ست کردن بر اساس آرایه selectedMovies است.
+            
+            // برای سادگی در این پروژه تک صفحه‌ای:
+            // ما فقط عدد روی کارت‌هایی که کلاس selected دارند را بر اساس ترتیب کلیک کاربر (که در آرایه است) آپدیت نمیکنیم
+            // بلکه عدد صرفا کانتر است. اما کاربر می‌خواهد اولویت ۱ و ۲ باشد.
+            // پس:
+            const allCards = document.querySelectorAll('.movie-card');
+            allCards.forEach(c => {
+                 // پیدا کردن نام فیلم از روی onclick attribute (روش هک سریع)
+                 const onClickAttr = c.getAttribute('onclick');
+                 const name = onClickAttr.match(/'(.*?)'/)[1];
+                 
+                 const index = selectedMovies.indexOf(name);
+                 if (index > -1) {
+                     c.querySelector('.priority-badge').innerText = index + 1;
+                 }
+            });
+        }
+
+        function validateMovies() {
+            const suggestion = document.getElementById('suggested-movie').value;
+            if (selectedMovies.length === 0 && suggestion.trim() === "") {
+                alert("لطفا حداقل یک فیلم انتخاب کنید یا پیشنهاد دهید!");
+                return;
+            }
+            scrollToSection('dates-section');
+        }
+
+        // 3. لاجیک انتخاب تاریخ
+        function toggleDate(box, dateStr) {
+            // ریست کردن سلکت باکس پایین
+            document.getElementById('custom-date-select').value = "";
+
+            const icon = box.querySelector('.check-icon');
+            
+            if (box.classList.contains('active')) {
+                box.classList.remove('active');
+                icon.style.opacity = '0';
+                selectedDates = selectedDates.filter(d => d !== dateStr);
+            } else {
+                box.classList.add('active');
+                icon.style.opacity = '1';
+                selectedDates.push(dateStr);
+            }
+        }
+
+        function resetDateBoxes() {
+            // وقتی از دراپ‌داون انتخاب میکنه، باکس‌ها غیرفعال بشن
+            document.querySelectorAll('.date-box').forEach(box => {
+                box.classList.remove('active');
+                box.querySelector('.check-icon').style.opacity = '0';
+            });
+            selectedDates = []; // خالی کردن آرایه باکس‌ها
+        }
+
+        // 4. ثبت نهایی
+        function submitVote() {
+            const suggestion = document.getElementById('suggested-movie').value;
+            const customDate = document.getElementById('custom-date-select').value;
+            
+            // بررسی فیلم
+            if (selectedMovies.length === 0 && suggestion.trim() === "") {
+                alert("لطفا فیلم را انتخاب کنید.");
+                scrollToSection('movies-section');
+                return;
+            }
+
+            // بررسی تاریخ
+            let finalDates = [...selectedDates];
+            if (customDate) finalDates.push(customDate);
+
+            if (finalDates.length === 0) {
+                alert("لطفا زمان پیشنهادی را مشخص کنید.");
+                return;
+            }
+
+            // نمایش مودال تایید
+            document.getElementById('final-modal').style.display = 'flex';
+        }
+
+        // 5. ارسال به واتساپ
+        function redirectToWhatsapp() {
+            const suggestion = document.getElementById('suggested-movie').value;
+            const customDate = document.getElementById('custom-date-select').value;
+            let finalDates = [...selectedDates];
+            if (customDate) finalDates.push(customDate);
+
+            // ساخت متن پیام
+            let movieText = "";
+            if (selectedMovies.length > 0) {
+                selectedMovies.forEach((m, index) => {
+                    movieText += `اولویت ${index + 1}: ${m}\n`;
+                });
+            }
+            if (suggestion) {
+                movieText += `پیشنهاد ویژه: ${suggestion}\n`;
+            }
+
+            let dateText = finalDates.join(" و ");
+
+            const message = `سلام آقای مجیدی
+رای من برای سینما:
+${movieText}
+برای تاریخ: ${dateText}
+اگر برگزار شود حضور خواهم داشت.`;
+
+            const phone = "989332631861";
+            const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            
+            window.location.href = url;
+        }
+
+        // بستن مودال با کلیک بیرون (اختیاری)
+        window.onclick = function(event) {
+            const modal = document.getElementById('final-modal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        // ============================================
+        // LOADING SCREEN LOGIC
+        // ============================================
+        window.addEventListener('load', () => {
+            // تنظیم زمان انتظار (6000 میلی ثانیه = 6 ثانیه)
+            setTimeout(() => {
+                const loader = document.getElementById('loading-screen');
+                loader.classList.add('hidden-loader');
+                
+                // فعال کردن اسکرول صفحه بعد از لودینگ (اگر قفل شده بود)
+                document.body.style.overflow = 'auto';
+            }, 6000); 
+        });
+    </script>
+</body>
+</html>
