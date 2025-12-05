@@ -397,7 +397,24 @@
             border-color: var(--neon-primary);
             box-shadow: 0 0 15px rgba(9, 132, 227, 0.1);
         }
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* برای اینکه تصویر، کادر را پر کند */
+            display: block;
+            position: absolute; /* برای قرارگیری زیر لایه شیشه‌ای */
+            top: 0; left: 0;
+            z-index: 1; /* زیر لایه ::after */
+        }
+        
+        /* اطمینان از اینکه لایه شیشه‌ای روی تصویر باشد */
+        .movie-poster {
+            position: relative; /* برای اینکه img روی آن Absolut شود */
+        }
 
+        .movie-poster::after {
+            z-index: 2; /* لایه گرادیان شیشه‌ای روی عکس بیاید */
+        }
         /* ========================================
         DATE SELECTION
         ========================================
@@ -687,47 +704,57 @@
             <h3 class="neon-text" style="margin-bottom: 10px; border-right: 4px solid var(--neon-primary); padding-right: 10px;">کدام فیلم را می‌پسندید؟</h3>
             <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 20px;">اولویت‌های خود را با لمس کردن انتخاب کنید (دوبار لمس برای لغو).</p>
             
-            <div class="movies-grid">
-                <div class="movie-card" onclick="toggleMovie(this, 'مرد عینکی')">
-                    <div class="priority-badge"></div>
-                    <div class="movie-poster">
-                        <i class="fa-solid fa-glasses"></i>
-                    </div>
-                    <div class="movie-info">
-                        <div class="movie-title">مرد عینکی</div>
-                    </div>
+<div class="movie-card" onclick="toggleMovie(this, 'مرد عینکی')">
+                <div class="priority-badge"></div>
+                <div class="movie-poster">
+                    <img src="https://raw.githubusercontent.com/hectoria-group/hectoria.github.io/main/Mard_Eynaki_Poster.jpeg" alt="پوستر مرد عینکی" class="poster-image">
                 </div>
-
-                <div class="movie-card" onclick="toggleMovie(this, 'کفایت مذاکرات')">
-                    <div class="priority-badge"></div>
-                    <div class="movie-poster">
-                        <i class="fa-solid fa-handshake"></i>
-                    </div>
-                    <div class="movie-info">
-                        <div class="movie-title">کفایت مذاکرات</div>
-                    </div>
+                <div class="movie-info">
+                    <div class="movie-title">مرد عینکی</div>
+                    <a href="#" class="trailer-link" onclick="event.stopPropagation(); alert('پخش تریلر مرد عینکی (لینک نمونه)')">
+                        <i class="fa-solid fa-play"></i> مشاهده تریلر
+                    </a>
                 </div>
+            </div>
 
-                <div class="movie-card" onclick="toggleMovie(this, 'قسطنطنیه')">
-                    <div class="priority-badge"></div>
-                    <div class="movie-poster">
-                        <i class="fa-solid fa-mosque"></i>
-                    </div>
-                    <div class="movie-info">
-                        <div class="movie-title">قسطنطنیه</div>
-
-                    </div>
+            <div class="movie-card" onclick="toggleMovie(this, 'کفایت مذاکرات')">
+                <div class="priority-badge"></div>
+                <div class="movie-poster">
+                    <img src="https://raw.githubusercontent.com/hectoria-group/hectoria.github.io/main/Kefayate-Mozakerat-Poster-1.jpg" alt="پوستر کفایت مذاکرات" class="poster-image">
                 </div>
-
-                <div class="movie-card" onclick="toggleMovie(this, 'خانه ارواح')">
-                    <div class="priority-badge"></div>
-                    <div class="movie-poster">
-                        <i class="fa-solid fa-ghost"></i>
-                    </div>
-                    <div class="movie-info">
-                        <div class="movie-title">خانه ارواح</div>
-                    </div>
+                <div class="movie-info">
+                    <div class="movie-title">کفایت مذاکرات</div>
+                    <a href="#" class="trailer-link" onclick="event.stopPropagation(); alert('پخش تریلر...')">
+                        <i class="fa-solid fa-play"></i> مشاهده تریلر
+                    </a>
                 </div>
+            </div>
+
+            <div class="movie-card" onclick="toggleMovie(this, 'قسطنطنیه')">
+                <div class="priority-badge"></div>
+                <div class="movie-poster">
+                    <img src="https://raw.githubusercontent.com/hectoria-group/hectoria.github.io/main/Constantinople_Poster.jpg" alt="پوستر قسطنطنیه" class="poster-image">
+                </div>
+                <div class="movie-info">
+                    <div class="movie-title">قسطنطنیه</div>
+                    <a href="#" class="trailer-link" onclick="event.stopPropagation(); alert('پخش تریلر...')">
+                        <i class="fa-solid fa-play"></i> مشاهده تریلر
+                    </a>
+                </div>
+            </div>
+
+            <div class="movie-card" onclick="toggleMovie(this, 'خانه ارواح')">
+                <div class="priority-badge"></div>
+                <div class="movie-poster">
+                    <img src="https://raw.githubusercontent.com/hectoria-group/hectoria.github.io/main/48999ffc-6022-444a-951c-a81fc556f29b_desktop.jpeg" alt="پوستر خانه ارواح" class="poster-image">
+                </div>
+                <div class="movie-info">
+                    <div class="movie-title">خانه ارواح</div>
+                    <a href="#" class="trailer-link" onclick="event.stopPropagation(); alert('پخش تریلر...')">
+                        <i class="fa-solid fa-play"></i> مشاهده تریلر
+                    </a>
+                </div>
+            </div>
             </div>
 
             <input type="text" id="suggested-movie" class="custom-input" placeholder="اگر هیچکدام، فیلم پیشنهادی شما؟">
