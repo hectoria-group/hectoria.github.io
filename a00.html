@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آکادمی هوش مصنوعی | کانون شهید پیرویان</title>
+    <!-- فونت وزیرمتن برای ظاهر مدرن فارسی -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    
+    <style>
+        /* --- تنظیمات کلی و متغیرها --- */
+        :root {
+            --bg-dark: #0b0e14;       /* پس زمینه اصلی */
+            --bg-panel: #151922;      /* پس زمینه کارت ها */
+            --primary: #7F5AF0;       /* بنفش نئونی */
+            --accent: #2CB67D;        /* سبز نئونی */
+            --cyan: #00F5FF;          /* آبی فیروزه‌ای (استایل گیمینگ) */
+            --text-main: #fffffe;
+            --text-sec: #94a1b2;
+            --glass: rgba(21, 25, 34, 0.7);
+            --border-radius: 24px;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- اسکرول بار سفارشی (برای وبکیت) --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-panel); 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary); 
+        }
+
+        /* --- ساختار صفحه (Layout) --- */
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+            background: radial-gradient(circle at top left, rgba(127, 90, 240, 0.15), transparent 40%);
+        }
+
+        /* --- سایدبار (Sidebar) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(21, 25, 34, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            position: fixed;
+            height: 100vh;
+            right: 0; /* RTL Sidebar */
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, var(--cyan), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .nav-links {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            color: var(--text-sec);
+            text-decoration: none;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(127, 90, 240, 0.1);
+            color: var(--text-main);
+            box-shadow: 0 0 15px rgba(127, 90, 240, 0.2);
+            border-right: 3px solid var(--primary);
+        }
+
+        .nav-icon {
+            margin-left: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* --- محتوای اصلی (Main Content) --- */
+        .main-content {
+            margin-right: var(--sidebar-width); /* برای RTL */
+            width: calc(100% - var(--sidebar-width));
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* --- استایل کارت‌ها و سکشن‌ها --- */
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--cyan);
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--cyan);
+        }
+
+        .card {
+            background: var(--bg-panel);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 2px var(--cyan);
+            border-color: rgba(0, 245, 255, 0.3);
+        }
+
+        /* --- بخش معرفی (Intro) --- */
+        .hero-card {
+            background: linear-gradient(135deg, rgba(21, 25, 34, 0.9), rgba(11, 14, 20, 0.95)), url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .highlight-text {
+            color: var(--cyan);
+            font-weight: bold;
+        }
+
+        .location-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(44, 182, 125, 0.1);
+            color: var(--accent);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(44, 182, 125, 0.3);
+        }
+
+        /* --- گرید دوره‌ها (Courses Grid) --- */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .course-card {
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .course-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
+        }
+
+        .course-price {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: var(--text-sec);
+        }
+
+        .course-price span {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        /* --- تیم ما (Team) --- */
+        .team-card {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .team-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--cyan));
+            padding: 3px;
+        }
+
+        .team-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #000;
+        }
+
+        .team-info h3 {
+            color: var(--text-main);
+            margin-bottom: 0.3rem;
+        }
+        .team-info p {
+            color: var(--text-sec);
+            font-size: 0.9rem;
+        }
+
+        /* --- مدال / پاپ‌آپ (Modal) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none; /* پیش فرض مخفی */
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #1a1f29;
+            width: 90%;
+            max-width: 500px;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            border: 1px solid rgba(127, 90, 240, 0.3);
+            box-shadow: 0 0 50px rgba(127, 90, 240, 0.2);
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+        }
+
+        .age-groups {
+            display: flex;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .age-badge {
+            background: rgba(255,255,255,0.05);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-sec);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .age-badge.active {
+            color: var(--accent);
+            background: rgba(44, 182, 125, 0.1);
+            border: 1px solid rgba(44, 182, 125, 0.3);
+        }
+
+        /* --- فرم ثبت نام --- */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-sec);
+            font-size: 0.9rem;
+        }
+        .form-input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Vazirmatn';
+            transition: 0.3s;
+        }
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(127, 90, 240, 0.3);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--primary), #5f3dc4);
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            box-shadow: 0 5px 20px rgba(127, 90, 240, 0.4);
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(127, 90, 240, 0.6);
+        }
+
+        /* --- ریسپانسیو (Mobile) --- */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                align-items: center;
+                padding: 1rem;
+                overflow-x: auto;
+                border-left: none;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+            .dashboard-container {
+                flex-direction: column;
+            }
+            .main-content {
+                margin-right: 0;
+                width: 100%;
+                padding: 1rem;
+            }
+            .logo-area {
+                margin-bottom: 0;
+                margin-left: 1rem;
+            }
+            .nav-links {
+                display: flex;
+                gap: 10px;
+            }
+            .nav-item {
+                margin-bottom: 0;
+            }
+            .nav-link span {
+                display: none; /* مخفی کردن متن منو در موبایل برای جا شدن */
+            }
+            .nav-link {
+                padding: 0.8rem;
+            }
+            .nav-icon {
+                margin-left: 0;
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo-area">
+                <div class="logo-text">AI ACADEMY</div>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="#intro" class="nav-link active">
+                        <span class="nav-icon">🏠</span>
+                        <span>معرفی مؤسسه</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#courses" class="nav-link">
+                        <span class="nav-icon">🎓</span>
+                        <span>دوره‌ها</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#team" class="nav-link">
+                        <span class="nav-icon">👥</span>
+                        <span>تیم فنی</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Section 1: Introduction -->
+            <section id="intro">
+                <h2 class="section-title">درباره ما</h2>
+                <div class="card hero-card">
+                    <h1 style="font-size: 2.5rem; margin-bottom: 1rem; text-shadow: 0 5px 15px rgba(0,0,0,0.5);">کانون شهید پیرویان</h1>
+                    <p style="font-size: 1.1rem; line-height: 1.8; max-width: 800px; color: #d1d5db;">
+                        پیشرو در آموزش تخصصی <span class="highlight-text">هوش مصنوعی</span> با رویکردی عملگرا برای سال 2025. 
+                        ما پلتفرمی برای پرورش متخصصان نسل آینده تحت نظارت مستقیم 
+                        <strong style="color: white; border-bottom: 1px dashed var(--primary);">دکتر زیبا دهقانی</strong> هستیم.
+                    </p>
+                    <div style="margin-top: 2rem;">
+                        <div class="location-badge">
+                            📍 مرکز تحقیقات آینده‌پژوهی و هوش مصنوعی کوانتومی (Quantum AI Hub)
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Courses -->
+            <section id="courses" style="margin-top: 4rem;">
+                <h2 class="section-title">دوره‌های آموزشی</h2>
+                <p style="color: var(--text-sec); margin-bottom: 2rem;">برای مشاهده جزئیات و ثبت‌نام روی دوره کلیک کنید.</p>
+                
+                <div class="courses-grid">
+                    <!-- Course 1 -->
+                    <div class="card course-card" onclick="openModal('مقدمات یادگیری عمیق', 'AI-DL001', '1,500,000')">
+                        <div class="course-icon">🧠</div>
+                        <h3>مقدمات یادگیری عمیق</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-sec); margin-top: 0.5rem;">Deep Learning Foundation</p>
+                        <div class="course-price">
+                            <span style="text-decoration: line-through; font-size: 0.9rem; color: #666;">2,700,000</span>
+                            <span>1,500,000 تومان</span>
+                        </div>
+                    </div>
+
+                    <!-- Course 2 -->
+                    <div class="card course-card" onclick="openModal('پایتون برای هوش مصنوعی', 'AI-PY022', '1,200,000')">
+                        <div class="course-icon">🐍</div>
+                        <h3>پایتون پیشرفته AI</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-sec); margin-top: 0.5rem;">Python For AI Mastery</p>
+                        <div class="course-price">
+                            <span style="text-decoration: line-through; font-size: 0.9rem; color: #666;">1,800,000</span>
+                            <span>1,200,000 تومان</span>
+                        </div>
+                    </div>
+
+                    <!-- Course 3 -->
+                    <div class="card course-card" onclick="openModal('بینایی ماشین', 'AI-CV033', '2,100,000')">
+                        <div class="course-icon">👁️</div>
+                        <h3>بینایی ماشین (CV)</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-sec); margin-top: 0.5rem;">Computer Vision Projects</p>
+                        <div class="course-price">
+                            <span style="text-decoration: line-through; font-size: 0.9rem; color: #666;">3,500,000</span>
+                            <span>2,100,000 تومان</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Team -->
+            <section id="team" style="margin-top: 4rem; padding-bottom: 4rem;">
+                <h2 class="section-title">تیم فنی</h2>
+                <div class="card team-card">
+                    <div class="team-avatar">
+                        <!-- Placeholder for Avatar -->
+                        <img src="https://ui-avatars.com/api/?name=Saeed+Rostami&background=0D8ABC&color=fff&size=128" alt="Saeed Rostami">
+                    </div>
+                    <div class="team-info">
+                        <h3>آقای سعید رستمی</h3>
+                        <p style="color: var(--primary);">مدیر توسعه فنی (Technical Development Manager)</p>
+                        <p style="margin-top: 0.5rem;">متخصص ارشد معماری سیستم‌های توزیع شده در سیلیکون ولی مجازی.</p>
+                        <div class="location-badge" style="background: rgba(127, 90, 240, 0.1); color: var(--primary); border-color: rgba(127, 90, 240, 0.3); margin-top: 0.5rem;">
+                             Distrubuted Systems Architect 💻
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-overlay" id="courseModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">✕</button>
+            
+            <div class="modal-header">
+                <h2 id="modalTitle" style="color: var(--cyan);">عنوان دوره</h2>
+                <span id="modalCode" style="font-size: 0.8rem; color: var(--text-sec); background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px;">CODE</span>
+            </div>
+
+            <p style="line-height: 1.6; color: #ddd; font-size: 0.95rem;">
+                این دوره شامل 120 ساعت محتوای ویدیویی، 20 پروژه عملی و پشتیبانی دائمی است. با استانداردهای 2025 طراحی شده است.
+            </p>
+
+            <div class="age-groups">
+                <div class="age-badge active">✓ 18-25</div>
+                <div class="age-badge active">✓ 25-40</div>
+                <div class="age-badge">40+</div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <a href="#" style="color: var(--primary); text-decoration: none; border-bottom: 1px dotted var(--primary);">🔗 پیش‌نیاز: آشنایی مقدماتی با کامپیوتر (ICDL)</a>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <h4 style="margin-bottom: 1rem; color: var(--accent);">فرم ثبت‌نام سریع</h4>
+                <div class="form-group">
+                    <label>نام و نام خانوادگی</label>
+                    <input type="text" id="userName" class="form-input" placeholder="مثال: علی محمدی">
+                </div>
+                <div class="form-group">
+                    <label>شماره تماس</label>
+                    <input type="tel" id="userPhone" class="form-input" placeholder="09xxxxxxxxx">
+                </div>
+                <button class="submit-btn" onclick="sendToWhatsapp()">
+                    <span>ثبت‌نام و ارسال به واتساپ</span>
+                    <span>➤</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Modal Logic ---
+        const modal = document.getElementById('courseModal');
+        let currentCourseName = '';
+        let currentCourseCode = '';
+
+        function openModal(title, code, price) {
+            currentCourseName = title;
+            currentCourseCode = code;
+            
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalCode').innerText = code;
+            
+            modal.classList.add('active');
+            // Disable body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal if clicked outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // --- WhatsApp Logic ---
+        function sendToWhatsapp() {
+            const name = document.getElementById('userName').value;
+            const phone = document.getElementById('userPhone').value;
+            
+            if(!name || !phone) {
+                alert("لطفا نام و شماره تماس خود را وارد کنید.");
+                return;
+            }
+
+            // فرمت پیام ارسالی
+            const message = `سلام، درخواست ثبت نام دارم:%0A` + 
+                            `👤 نام: ${name}%0A` +
+                            `📱 شماره: ${phone}%0A` +
+                            `🎓 دوره: ${currentCourseName} (${currentCourseCode})`;
+
+            // شماره مقصد (لطفا شماره واقعی خود را جایگزین کنید - بدون صفر اول)
+            const adminPhone = "989000000000"; 
+            
+            const url = `https://wa.me/${adminPhone}?text=${message}`;
+            window.open(url, '_blank');
+        }
+
+        // --- Active Link Logic on Scroll ---
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
